@@ -15,6 +15,14 @@ export default defineType({
     }),
 
     defineField({
+      name: 'location',
+      title: 'location tour',
+      type: 'string',
+      options: { source: 'title', maxLength: 96 },
+      validation: Rule => Rule.required(),
+    }),
+        
+    defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
@@ -25,8 +33,21 @@ export default defineType({
     defineField({
       name: 'tagline',
       title: 'Short Description',
-      type: 'text',
-      rows: 2,
+      type: 'object',
+      fields: [
+        {
+          name: 'en',
+          title: 'English',
+          type: 'string',
+          description: 'Short description in English',
+        },
+        {
+          name: 'ms',
+          title: 'Malay',
+          type: 'string',
+          description: 'Short description in Malay',
+        },
+      ],
     }),
 
     defineField({
@@ -36,113 +57,141 @@ export default defineType({
       options: { hotspot: true },
     }),
 
-    // Pricing & Duration
-  defineField({
-    name: 'pricing',
-    title: 'Pricing',
-    type: 'array',
-    of: [
-      {
-        type: 'object',
-        fields: [
-          {
-            name: 'groupSize',
-            title: 'Group Size',
-            type: 'string',
-            description: 'Example: "10 pax and above" or "3-4 pax"',
-          },
-          {
-            name: 'adultPrice',
-            title: 'Adult Price (RM)',
-            type: 'number',
-          },
-          {
-            name: 'childPrice',
-            title: 'Child Price (RM)',
-            type: 'number',
-            description: 'For children aged 3–11',
-          },
-        ],
-        preview: {
-          select: {
-            groupSize: 'groupSize',
-            adultPrice: 'adultPrice',
-            childPrice: 'childPrice',
-          },
-          prepare({ groupSize, adultPrice, childPrice }) {
-            return {
-              title: `${groupSize} - Adult: RM${adultPrice}, Child: RM${childPrice}`,
-            };
+    // Flexible Dual-Language Pricing
+    defineField({
+      name: 'pricing',
+      title: 'Pricing',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'groupSize',
+              title: 'Group / Package',
+              type: 'object',
+              fields: [
+                { name: 'en', title: 'English', type: 'string', description: 'Example: "10 pax and above"' },
+                { name: 'ms', title: 'Malay', type: 'string', description: 'Contoh: "10 pax dewasa dan ke atas"' },
+              ],
+            },
+            {
+              name: 'adultPrice',
+              title: 'Adult Price',
+              type: 'string',
+              description: 'Flexible format: RM1,699 or RM1,699/pax',
+            },
+            {
+              name: 'childPrice',
+              title: 'Child Price (Optional)',
+              type: 'string',
+              description: 'Flexible format: RM849 or N/A, age 3–11',
+            },
+            {
+              name: 'notes',
+              title: 'Notes / Details',
+              type: 'object',
+              fields: [
+                { name: 'en', title: 'English', type: 'text', rows: 2, description: 'Extra info like flight excluded, age ranges' },
+                { name: 'ms', title: 'Malay', type: 'text', rows: 2, description: 'Maklumat tambahan seperti penerbangan tidak termasuk, umur' },
+              ],
+            },
+          ],
+          preview: {
+            select: {
+              groupSizeEn: 'groupSize.en',
+              adultPrice: 'adultPrice',
+              childPrice: 'childPrice',
+            },
+            prepare({ groupSizeEn, adultPrice, childPrice }) {
+              let subtitle = adultPrice || ''
+              if (childPrice) subtitle += ` | Child: ${childPrice}`
+              return {
+                title: groupSizeEn,
+                subtitle,
+              }
+            },
           },
         },
-      },
-    ],
-  }),
+      ],
+    }),
 
     defineField({
       name: 'duration',
       title: 'Duration',
       type: 'string',
-      description: 'Example: 3 Days / 2 Nights',
+      description: 'Example: 3Days/2Night',
     }),
 
-  defineField({
-  name: 'itinerary',
-  title: 'Itinerary',
-  type: 'array',
-  of: [
-    {
-      type: 'object',
-      fields: [
+   defineField({
+      name: 'itinerary',
+      title: 'Itinerary',
+      type: 'array',
+      of: [
         {
-          name: 'day',
-          title: 'Day',
-          type: 'string',
-          description: 'Example: "Day 1"',
-        },
-        {
-          name: 'title',
-          title: 'Title / Location',
-          type: 'string',
-          description: 'Short title of the day, e.g., "Jakarta Arrival & Bandung"',
-        },
-        {
-          name: 'description',
-          title: 'Description',
-          type: 'text',
-          rows: 3,
-          description: 'Detailed activities for the day',
-        },
-        {
-          name: 'meals',
-          title: 'Meals',
-          type: 'string',
-          description: 'B = Breakfast, L = Lunch, D = Dinner (Example: "B, L, D")',
+          type: 'object',
+          fields: [
+            {
+              name: 'day',
+              title: 'Day',
+              type: 'string',
+              description: 'Example: "Day 1"',
+            },
+            {
+              name: 'title',
+              title: 'Title / Location',
+              type: 'object',
+              fields: [
+                { name: 'en', title: 'English', type: 'string', description: 'Short title of the day in English' },
+                { name: 'ms', title: 'Malay', type: 'string', description: 'Short title of the day in Malay' },
+              ],
+            },
+            {
+              name: 'description',
+              title: 'Description',
+              type: 'object',
+              fields: [
+                { name: 'en', title: 'English', type: 'text', rows: 3, description: 'Detailed activities in English' },
+                { name: 'ms', title: 'Malay', type: 'text', rows: 3, description: 'Detailed activities in Malay' },
+              ],
+            },
+          ],
+          preview: {
+            select: {
+              day: 'day',
+              titleEn: 'title.en',
+              meals: 'meals',
+            },
+            prepare({ day, titleEn, meals }) {
+              return {
+                title: `${day}: ${titleEn}`,
+                subtitle: meals,
+              }
+            },
+          },
         },
       ],
-      preview: {
-        select: {
-          day: 'day',
-          title: 'title',
-          meals: 'meals',
-        },
-        prepare({ day, title, meals }) {
-          return {
-            title: `${day}: ${title}`,
-            subtitle: meals,
-          };
-        },
-      },
-    },
-  ],
-}),
+    }),
 
     // Overview
     defineField({
       name: 'overview',
       title: 'Overview',
-      type: 'array',
-      of: [{ type: 'block' }],
+      type: 'object',
+      fields: [
+        {
+          name: 'en',
+          title: 'English',
+          type: 'array',
+          of: [{ type: 'block' }],
+        },
+        {
+          name: 'ms',
+          title: 'Malay',
+          type: 'array',
+          of: [{ type: 'block' }],
+        },
+      ],
     }),
 
     // Highlights
@@ -150,7 +199,15 @@ export default defineType({
       name: 'highlights',
       title: 'Highlights',
       type: 'array',
-      of: [{ type: 'string' }],
+      of: [
+        {
+          type: 'object',
+          fields: [
+            { name: 'en', title: 'English', type: 'string' },
+            { name: 'ms', title: 'Malay', type: 'string' },
+          ],
+        },
+      ],
     }),
 
     // Included
@@ -158,7 +215,15 @@ export default defineType({
       name: 'included',
       title: 'Included',
       type: 'array',
-      of: [{ type: 'string' }],
+      of: [
+        {
+          type: 'object',
+          fields: [
+            { name: 'en', title: 'English', type: 'string' },
+            { name: 'ms', title: 'Malay', type: 'string' },
+          ],
+        },
+      ],
     }),
 
     // Not Included
@@ -166,7 +231,15 @@ export default defineType({
       name: 'notIncluded',
       title: 'Not Included',
       type: 'array',
-      of: [{ type: 'string' }],
+      of: [
+        {
+          type: 'object',
+          fields: [
+            { name: 'en', title: 'English', type: 'string' },
+            { name: 'ms', title: 'Malay', type: 'string' },
+          ],
+        },
+      ],
     }),
 
     // Gallery
@@ -175,6 +248,16 @@ export default defineType({
       title: 'Gallery Images',
       type: 'array',
       of: [{ type: 'image' }],
+    }),
+
+    defineField({
+      name: 'brochure',
+      title: 'Brochure / PDF',
+      type: 'file',
+      description: 'Optional PDF brochure for the tour',
+      options: {
+        accept: '.pdf', // restrict to PDF files
+      },
     }),
 
     defineField({
