@@ -17,6 +17,8 @@ export default function Navigation({ locale, isMobile = false, isScrolled = fals
   const navItems = [
     { label: t(locale, 'navigation.home'), href: `/${locale}` },
     { label: t(locale, 'navigation.tours'), href: `/${locale}/tours` },
+    { label: t(locale, 'navigation.carRental'), href: `/${locale}/car-rental` },
+    { label: t(locale, 'navigation.events'), href: `/${locale}/events` },
     { label: t(locale, 'navigation.about'), href: `/${locale}/about` },
     { label: t(locale, 'navigation.contact'), href: `/${locale}/contact` },
   ];
@@ -57,7 +59,7 @@ export default function Navigation({ locale, isMobile = false, isScrolled = fals
           key={item.href}
           href={item.href}
           className={cn(
-            'relative px-4 py-2 font-medium text-sm transition-all rounded-full',
+            'relative px-3 py-2 font-medium text-sm transition-all rounded-full whitespace-nowrap',
             isActive(item.href)
               ? isScrolled 
                 ? 'text-[#E31E24]' 

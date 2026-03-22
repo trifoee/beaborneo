@@ -69,8 +69,10 @@ export const translations = {
   en: {
     navigation: {
       home: 'Home',
-      about: 'About Us',
       tours: 'Tours',
+      carRental: 'Car Rental',
+      events: 'Events & Offers',
+      about: 'About Us',
       contact: 'Contact',
     },
     common: {
@@ -101,8 +103,10 @@ export const translations = {
   ms: {
     navigation: {
       home: 'Utama',
-      about: 'Tentang Kami',
       tours: 'Pakej Pelancongan',
+      carRental: 'Sewa Kereta',
+      events: 'Acara & Tawaran',
+      about: 'Tentang Kami',
       contact: 'Hubungi',
     },
     common: {
@@ -133,8 +137,10 @@ export const translations = {
   id: {
     navigation: {
       home: 'Beranda',
-      about: 'Tentang Kami',
       tours: 'Paket Wisata',
+      carRental: 'Sewa Mobil',
+      events: 'Acara & Promo',
+      about: 'Tentang Kami',
       contact: 'Kontak',
     },
     common: {
