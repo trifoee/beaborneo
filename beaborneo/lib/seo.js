@@ -118,13 +118,32 @@ export function generateOrganizationSchema(locale) {
   return {
     '@context': 'https://schema.org',
     '@type': 'TravelAgency',
-    name: getLocalizedValue(siteConfig.siteName, locale),
+    name: 'Bea Borneo Travel & Tours Sdn. Bhd.',
     description: getLocalizedValue(siteConfig.siteDescription, locale),
     url: siteConfig.baseUrl,
-    // TODO: Add more fields when CMS data is available
-    // logo: '',
-    // address: {},
-    // contactPoint: {},
+    logo: `${siteConfig.baseUrl}/images/logo.png`,
+    image: `${siteConfig.baseUrl}/images/logo.png`,
+    telephone: ['+60-88-212982', '+60-18-2103921'],
+    email: 'beaborneo@gmail.com',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Lot B13-2A-2, Block B, 1st Floor, Kepayan Perdana',
+      addressLocality: 'Penampang',
+      addressRegion: 'Sabah',
+      postalCode: '88300',
+      addressCountry: 'MY',
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: 5.9714,
+      longitude: 116.0533,
+    },
+    sameAs: [
+      'https://facebook.com/beaborneotravel',
+      'https://instagram.com/beaborneotravel',
+      'https://tiktok.com/@beaborneotravel',
+    ],
+    priceRange: '$$',
   };
 }
 

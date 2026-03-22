@@ -212,10 +212,9 @@ export default function Hero({ locale }) {
             </div>
           </div>
 
-          {/* Right Side - Preview Images */}
+          {/* Right Side - Preview Images (commented out)
           <div className="hidden lg:block relative">
             <div className="flex gap-4 justify-end">
-              {/* Main preview card */}
               <div 
                 key={`preview-${currentSlide}`}
                 className="animate-slide-in-right opacity-0 relative w-80 h-96 rounded-3xl overflow-hidden shadow-2xl"
@@ -241,8 +240,6 @@ export default function Hero({ locale }) {
                   </p>
                 </div>
               </div>
-
-              {/* Secondary preview */}
               <div 
                 className="animate-slide-in-right opacity-0 delay-200 relative w-48 h-64 rounded-2xl overflow-hidden shadow-xl self-center"
               >
@@ -258,6 +255,7 @@ export default function Hero({ locale }) {
               </div>
             </div>
           </div>
+          */}
         </div>
       </div>
 
