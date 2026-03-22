@@ -8,6 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { t } from '@/lib/i18n';
 import Navigation from './Navigation';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -45,24 +46,16 @@ export default function Header({ locale }) {
             href={`/${locale}`}
             className="flex items-center gap-3 group"
           >
-            {/* Logo Mark */}
-            <div className={cn(
-              "relative w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300",
-              isScrolled ? "bg-[#E31E24]" : "bg-white"
-            )}>
-              <div className={cn(
-                "absolute inset-1 rounded-full border-2 flex items-center justify-center",
-                isScrolled ? "border-white/30" : "border-[#E31E24]/30"
-              )}>
-                <span className={cn(
-                  "font-bold text-sm tracking-tight",
-                  isScrolled ? "text-white" : "text-[#E31E24]"
-                )}>
-                  BEA
-                </span>
-              </div>
+            <div className="relative w-12 h-12 rounded-full overflow-hidden shadow-md transition-transform duration-300 group-hover:scale-105">
+              <Image
+                src="/images/logo.png"
+                alt="BEA Borneo"
+                width={48}
+                height={48}
+                className="w-full h-full object-cover"
+                priority
+              />
             </div>
-            {/* Logo Text */}
             <div className="hidden sm:block">
               <div className={cn(
                 "font-bold text-lg tracking-tight transition-colors",
@@ -80,7 +73,7 @@ export default function Header({ locale }) {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-6">
             <Navigation locale={locale} isScrolled={isScrolled} />
             <div className="flex items-center gap-4">
               <LanguageSwitcher locale={locale} isScrolled={isScrolled} />
@@ -132,7 +125,7 @@ export default function Header({ locale }) {
         <div
           className={cn(
             'lg:hidden overflow-hidden transition-all duration-300',
-            isMobileMenuOpen ? 'max-h-[400px] mt-4' : 'max-h-0'
+            isMobileMenuOpen ? 'max-h-[500px] mt-4' : 'max-h-0'
           )}
         >
           <div className="bg-white rounded-2xl shadow-xl p-6">

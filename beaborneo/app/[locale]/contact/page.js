@@ -23,15 +23,20 @@ const contactContent = {
   info: {
     address: {
       label: { en: 'Address', ms: 'Alamat', id: 'Alamat' },
-      value: 'Lot 123, Jalan Gaya\nKota Kinabalu, 88000\nSabah, Malaysia',
+      value: {
+        en: 'Lot B13-2A-2, Block B, 1st Floor,\nKepayan Perdana, 88300\nPenampang, Sabah, Malaysia',
+        ms: 'Lot B13-2A-2, Blok B, Tingkat 1,\nKepayan Perdana, 88300\nPenampang, Sabah, Malaysia',
+        id: 'Lot B13-2A-2, Blok B, Lantai 1,\nKepayan Perdana, 88300\nPenampang, Sabah, Malaysia',
+      },
     },
     phone: {
       label: { en: 'Phone', ms: 'Telefon', id: 'Telepon' },
-      value: '+60 88 123 456',
+      value: '+60 88 212 982',
+      mobile: '+60 18 210 3921',
     },
     email: {
       label: { en: 'Email', ms: 'Emel', id: 'Email' },
-      value: 'hello@beaborneo.com',
+      value: 'beaborneo@gmail.com',
     },
     hours: {
       label: { en: 'Office Hours', ms: 'Waktu Operasi', id: 'Jam Operasional' },
@@ -41,13 +46,17 @@ const contactContent = {
         id: 'Senin - Jumat: 9:00 - 18:00\nSabtu: 9:00 - 13:00\nMinggu: Tutup',
       },
     },
+    social: {
+      label: { en: 'Social Media', ms: 'Media Sosial', id: 'Media Sosial' },
+      handle: '@beaborneotravel',
+    },
   },
   seo: {
     title: { en: 'Contact Us', ms: 'Hubungi Kami', id: 'Hubungi Kami' },
     description: {
-      en: 'Contact Bea Borneo Travel for tour inquiries and bookings.',
-      ms: 'Hubungi Bea Borneo Travel untuk pertanyaan dan tempahan pakej.',
-      id: 'Hubungi Bea Borneo Travel untuk pertanyaan dan pemesanan paket.',
+      en: 'Contact Bea Borneo Travel & Tours for tour inquiries, custom packages, and bookings. MOTAC-licensed travel agency in Penampang, Sabah.',
+      ms: 'Hubungi Bea Borneo Travel & Tours untuk pertanyaan pelancongan, pakej khas, dan tempahan. Agensi pelancongan berlesen MOTAC di Penampang, Sabah.',
+      id: 'Hubungi Bea Borneo Travel & Tours untuk pertanyaan wisata, paket khusus, dan pemesanan. Agen perjalanan berlisensi MOTAC di Penampang, Sabah.',
     },
   },
 };
@@ -147,9 +156,15 @@ export default async function ContactPage({ params }) {
                         </div>
                         <a 
                           href={`tel:${contactContent.info.phone.value}`}
-                          className="text-gray-900 font-semibold hover:text-[#E31E24] transition-colors"
+                          className="text-gray-900 font-semibold hover:text-[#E31E24] transition-colors block"
                         >
                           {contactContent.info.phone.value}
+                        </a>
+                        <a 
+                          href={`tel:${contactContent.info.phone.mobile}`}
+                          className="text-gray-900 font-semibold hover:text-[#E31E24] transition-colors block"
+                        >
+                          {contactContent.info.phone.mobile}
                         </a>
                       </div>
                     </div>
@@ -167,8 +182,58 @@ export default async function ContactPage({ params }) {
                           {getLocalizedValue(contactContent.info.address.label, locale)}
                         </div>
                         <p className="text-gray-900 font-semibold whitespace-pre-line">
-                          {contactContent.info.address.value}
+                          {getLocalizedValue(contactContent.info.address.value, locale)}
                         </p>
+                      </div>
+                    </div>
+
+                    {/* Social Media */}
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <svg className="w-5 h-5 text-[#E31E24]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-500 mb-1">
+                          {getLocalizedValue(contactContent.info.social.label, locale)}
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <a 
+                            href="https://facebook.com/beaborneotravel"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gray-900 font-semibold hover:text-[#E31E24] transition-colors"
+                            aria-label="Facebook"
+                          >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z" />
+                            </svg>
+                          </a>
+                          <a 
+                            href="https://instagram.com/beaborneotravel"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gray-900 font-semibold hover:text-[#E31E24] transition-colors"
+                            aria-label="Instagram"
+                          >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
+                            </svg>
+                          </a>
+                          <a 
+                            href="https://tiktok.com/@beaborneotravel"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-gray-900 font-semibold hover:text-[#E31E24] transition-colors"
+                            aria-label="TikTok"
+                          >
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 0010.86 4.46 6.28 6.28 0 001.88-4.49V8.76a8.26 8.26 0 004.84 1.56v-3.5a4.84 4.84 0 01-1.14-.13z" />
+                            </svg>
+                          </a>
+                          <span className="text-gray-600 text-sm ml-1">{contactContent.info.social.handle}</span>
+                        </div>
                       </div>
                     </div>
 
@@ -205,7 +270,7 @@ export default async function ContactPage({ params }) {
                       : 'Berbual dengan kami secara langsung!'}
                   </p>
                   <a 
-                    href="https://wa.me/60881234567"
+                    href="https://wa.me/60182103921"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#25D366] rounded-full font-semibold hover:bg-gray-100 transition-colors"
@@ -225,17 +290,45 @@ export default async function ContactPage({ params }) {
       {/* Map Section */}
       <section className="pb-20">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="bg-gray-100 rounded-3xl h-96 flex items-center justify-center overflow-hidden">
-            {/* TODO: Add Google Maps embed */}
-            <div className="text-center text-gray-500">
-              <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <p className="font-medium">
-                {locale === 'en' ? 'Map will be displayed here' : 'Peta akan dipaparkan di sini'}
-              </p>
+          <div className="rounded-3xl overflow-hidden shadow-lg">
+            <div className="bg-stone-50 px-8 py-6 flex items-center gap-4 border-b border-gray-100">
+              <div className="w-10 h-10 rounded-full bg-[#E31E24]/10 flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-[#E31E24]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-heading font-bold text-gray-900">
+                  {locale === 'en' ? 'Find Us' : 'Cari Kami'}
+                </h3>
+                <p className="text-sm text-gray-500">
+                  Kepayan Perdana, 88300 Penampang, Sabah, Malaysia
+                </p>
+              </div>
+              <a
+                href="https://www.google.com/maps/search/Kepayan+Perdana+88300+Penampang+Sabah+Malaysia"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-auto hidden sm:inline-flex items-center gap-2 px-5 py-2.5 bg-[#E31E24] text-white text-sm font-semibold rounded-full hover:bg-[#c41a1f] transition-colors"
+              >
+                {locale === 'en' ? 'Get Directions' : 'Dapatkan Arah'}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
             </div>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.9!2d116.0533!3d5.9714!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x323b69e0aa1234%3A0x0!2sKepayan+Perdana%2C+88300+Penampang%2C+Sabah!5e0!3m2!1sen!2smy!4v1"
+              width="100%"
+              height="450"
+              style={{ border: 0 }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Bea Borneo Travel & Tours Location"
+              className="w-full"
+            />
           </div>
         </div>
       </section>
