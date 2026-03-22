@@ -57,7 +57,6 @@ export default defineType({
       options: { hotspot: true },
     }),
 
-    // Flexible Dual-Language Pricing
     defineField({
       name: 'pricing',
       title: 'Pricing',
@@ -66,6 +65,7 @@ export default defineType({
         {
           type: 'object',
           fields: [
+            // Group / Package
             {
               name: 'groupSize',
               title: 'Group / Package',
@@ -75,18 +75,35 @@ export default defineType({
                 { name: 'ms', title: 'Malay', type: 'string', description: 'Contoh: "10 pax dewasa dan ke atas"' },
               ],
             },
+
+            // Adult Price
             {
               name: 'adultPrice',
               title: 'Adult Price',
               type: 'string',
               description: 'Flexible format: RM1,699 or RM1,699/pax',
             },
+
+            // Child Price
             {
               name: 'childPrice',
-              title: 'Child Price (Optional)',
+              title: 'Child Price',
               type: 'string',
-              description: 'Flexible format: RM849 or N/A, age 3–11',
+              description: 'Flexible format: RM849 or RM849/pax',
             },
+
+            // Child Age Range
+            {
+              name: 'childAgeRange',
+              title: 'Child Age Range',
+              type: 'object',
+              fields: [
+                { name: 'en', title: 'English', type: 'string', description: 'Example: "Age 3–11"' },
+                { name: 'ms', title: 'Malay', type: 'string', description: 'Contoh: "Umur 3–11 tahun"' },
+              ],
+            },
+
+            // Notes (optional)
             {
               name: 'notes',
               title: 'Notes / Details',
@@ -97,6 +114,8 @@ export default defineType({
               ],
             },
           ],
+
+          // Preview: show group size + prices
           preview: {
             select: {
               groupSizeEn: 'groupSize.en',
@@ -107,11 +126,90 @@ export default defineType({
               let subtitle = adultPrice || ''
               if (childPrice) subtitle += ` | Child: ${childPrice}`
               return {
-                title: groupSizeEn,
+                title: groupSizeEn || 'Package',
                 subtitle,
               }
             },
           },
+        },
+      ],
+    }),
+
+    // ==========================
+    // Accommodation Pricing
+    // ==========================
+    defineField({
+      name: 'accommodationPricing',
+      title: 'Accommodation Pricing',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'accommodationType',
+              title: 'Accommodation Type',
+              type: 'object',
+              fields: [
+                { name: 'en', title: 'English', type: 'string', description: 'Example: "Deluxe King / Cabin / Hostel / Deluxe Queen"' },
+                { name: 'ms', title: 'Malay', type: 'string', description: 'Contoh: "Deluxe King / Kabin / Asrama / Deluxe Queen"' },
+              ],
+            },
+            {
+              name: 'price',
+              title: 'Price',
+              type: 'string',
+              description: 'Flexible format: RM price or N/A',
+            },
+            {
+              name: 'notes',
+              title: 'Notes / Details',
+              type: 'object',
+              fields: [
+                { name: 'en', title: 'English', type: 'text', rows: 2, description: 'Extra info for this accommodation' },
+                { name: 'ms', title: 'Malay', type: 'text', rows: 2, description: 'Maklumat tambahan untuk penginapan ini' },
+              ],
+            },
+          ],
+          preview: {
+            select: {
+              accommodationEn: 'accommodationType.en',
+              price: 'price',
+            },
+            prepare({ accommodationEn, price }) {
+              return {
+                title: accommodationEn,
+                subtitle: price || '',
+              }
+            },
+          },
+        },
+      ],
+    }),
+
+   defineField({
+      name: 'notes',
+      title: 'Pricing Notes / Details (Optional)',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'en',
+              title: 'English',
+              type: 'text',
+              rows: 2,
+              description: 'Extra info about pricing or special conditions, e.g., child rate',
+            },
+            {
+              name: 'ms',
+              title: 'Malay',
+              type: 'text',
+              rows: 2,
+              description: 'Maklumat tambahan tentang harga atau syarat khas, contohnya kadar kanak-kanak',
+            },
+          ],
         },
       ],
     }),
@@ -134,8 +232,11 @@ export default defineType({
             {
               name: 'day',
               title: 'Day',
-              type: 'string',
-              description: 'Example: "Day 1"',
+              type: 'object',
+              fields: [
+                { name: 'en', title: 'English', type: 'string', description: 'example: DAY 1' },
+                { name: 'ms', title: 'Malay', type: 'string', description: 'contoh : HARI 1' },
+              ],
             },
             {
               name: 'title',
@@ -158,14 +259,12 @@ export default defineType({
           ],
           preview: {
             select: {
-              day: 'day',
+              dayEn: 'day.en',
               titleEn: 'title.en',
-              meals: 'meals',
             },
-            prepare({ day, titleEn, meals }) {
+            prepare({ dayEn, titleEn }) {
               return {
-                title: `${day}: ${titleEn}`,
-                subtitle: meals,
+                title: `${dayEn}: ${titleEn}`,
               }
             },
           },
