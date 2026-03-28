@@ -15,6 +15,38 @@ export default defineType({
     }),
 
     defineField({
+      name: 'packageCategory',
+      title: 'Package Category',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Tour Package', value: 'tour' },
+          { title: 'Activity Package', value: 'activity' },
+        ],
+        layout: 'radio', // nice UI
+      },
+      validation: Rule => Rule.required(),
+    }),
+
+    defineField({
+      name: 'tourType',
+      title: 'Tour Type',
+      type: 'array',
+      of: [{ type: 'string' }],
+      options: {
+        list: [
+          { title: 'Island Hopping', value: 'island-hopping' },
+          { title: 'Island Stay', value: 'island-stay' },
+          { title: 'Scuba Diving', value: 'scuba-diving' },
+          { title: 'Snorkeling', value: 'snorkeling' },
+          { title: 'Nature & Wildlife', value: 'nature-wildlife' },
+          { title: 'Adventure', value: 'adventure' },
+          { title: 'Leisure', value: 'leisure' },
+        ],
+      },
+    }),
+
+    defineField({
       name: 'location',
       title: 'location tour',
       type: 'string',
@@ -58,8 +90,8 @@ export default defineType({
     }),
 
     defineField({
-      name: 'pricing',
-      title: 'Pricing',
+      name: 'pricingPax',
+      title: 'Pricing Pax',
       type: 'array',
       of: [
         {
@@ -92,16 +124,6 @@ export default defineType({
               description: 'Flexible format: RM849 or RM849/pax',
             },
 
-            // Child Age Range
-            {
-              name: 'childAgeRange',
-              title: 'Child Age Range',
-              type: 'object',
-              fields: [
-                { name: 'en', title: 'English', type: 'string', description: 'Example: "Age 3–11"' },
-                { name: 'ms', title: 'Malay', type: 'string', description: 'Contoh: "Umur 3–11 tahun"' },
-              ],
-            },
 
             // Notes (optional)
             {
@@ -135,9 +157,81 @@ export default defineType({
       ],
     }),
 
-    // ==========================
-    // Accommodation Pricing
-    // ==========================
+    defineField({
+      name: 'pricingByMarket',
+      title: 'Pricing by Market',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'marketType',
+              title: 'Market Type',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'Malaysian', value: 'malaysian' },
+                  { title: 'International', value: 'international' },
+                ],
+                layout: 'radio',
+              },
+            },
+
+            {
+              name: 'groupSize',
+              title: 'Group / Package',
+              type: 'object',
+              fields: [
+                { name: 'en', title: 'English', type: 'string' },
+                { name: 'ms', title: 'Malay', type: 'string' },
+              ],
+            },
+
+            {
+              name: 'adultPrice',
+              title: 'Adult Price',
+              type: 'string',
+            },
+
+            {
+              name: 'childPrice',
+              title: 'Child Price',
+              type: 'string',
+            },
+
+            {
+              name: 'notes',
+              title: 'Notes / Details',
+              type: 'object',
+              fields: [
+                { name: 'en', title: 'English', type: 'text', rows: 2 },
+                { name: 'ms', title: 'Malay', type: 'text', rows: 2 },
+              ],
+            },
+          ],
+
+          preview: {
+            select: {
+              market: 'marketType',
+              groupSizeEn: 'groupSize.en',
+              adultPrice: 'adultPrice',
+              childPrice: 'childPrice',
+            },
+            prepare({ market, groupSizeEn, adultPrice, childPrice }) {
+              let subtitle = adultPrice || ''
+              if (childPrice) subtitle += ` | Child: ${childPrice}`
+
+              return {
+                title: `${market ? market.toUpperCase() : ''} - ${groupSizeEn || 'Package'}`,
+                subtitle,
+              }
+            },
+          },
+        },
+      ],
+    }),
+    
     defineField({
       name: 'accommodationPricing',
       title: 'Accommodation Pricing',
@@ -185,7 +279,60 @@ export default defineType({
           },
         },
       ],
-    }),
+          }),
+          
+    defineField({
+        name: 'pricingpackage',
+        title: 'Pricing Package',
+        type: 'array',
+        of: [
+          {
+            type: 'object',
+            fields: [
+              // Package name (dual language)
+              {
+                name: 'package',
+                title: 'Package',
+                type: 'object',
+                fields: [
+                  { name: 'en', title: 'English', type: 'string',  description: 'example: 2 DAY 1 NIGHT' },
+                  { name: 'ms', title: 'Malay', type: 'string',  description: 'example: 2 Hari 1 Malam' },
+                ],
+              },
+
+              // Adult price (single value)
+              {
+                name: 'adult',
+                title: 'Adult Rate',
+                type: 'string',
+                description: 'Adult rate, e.g., RM1,699',
+              },
+
+              // Child price (single value)
+              {
+                name: 'child',
+                title: 'Child Rate',
+                type: 'string',
+                description: 'Child rate (3–11 Y/O), e.g., RM849',
+              },
+            ],
+
+            preview: {
+              select: {
+                pkg: 'package.en',
+                adult: 'adult',
+                child: 'child',
+              },
+              prepare({ pkg, adult, child }) {
+                return {
+                  title: pkg,
+                  subtitle: `${adult || ''} | ${child || ''}`,
+                }
+              },
+            },
+          },
+        ],
+      }),
 
    defineField({
       name: 'notes',
