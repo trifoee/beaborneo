@@ -15,20 +15,6 @@ export default defineType({
     }),
 
     defineField({
-      name: 'packageCategory',
-      title: 'Package Category',
-      type: 'string',
-      options: {
-        list: [
-          { title: 'Tour Package', value: 'tour' },
-          { title: 'Activity Package', value: 'activity' },
-        ],
-        layout: 'radio', // nice UI
-      },
-      validation: Rule => Rule.required(),
-    }),
-
-    defineField({
       name: 'tourType',
       title: 'Tour Type',
       type: 'array',
@@ -90,66 +76,48 @@ export default defineType({
     }),
 
     defineField({
-      name: 'pricingPax',
-      title: 'Pricing Pax',
+      name: 'pricingType',
+      title: 'Pricing Type',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Package Pricing (Adult / Child)', value: 'package' },
+          { title: 'Group Pricing (Pax Based)', value: 'group' },
+          { title: 'Market Pricing (MY / International)', value: 'market' },
+          { title: 'Accommodation Pricing', value: 'accommodation' },
+        ],
+        layout: 'dropdown',
+      },
+      validation: Rule => Rule.required(),
+    }),
+
+    // =========================
+    // ✅ PACKAGE PRICING
+    // =========================
+    defineField({
+      name: 'packagePricing',
+      title: 'Package Pricing',
       type: 'array',
+      hidden: ({ document }) => document?.pricingType !== 'package',
       of: [
         {
           type: 'object',
           fields: [
-            // Group / Package
             {
-              name: 'groupSize',
-              title: 'Group / Package',
-              type: 'object',
-              fields: [
-                { name: 'en', title: 'English', type: 'string', description: 'Example: "10 pax and above"' },
-                { name: 'ms', title: 'Malay', type: 'string', description: 'Contoh: "10 pax dewasa dan ke atas"' },
-              ],
-            },
-
-            // Adult Price
-            {
-              name: 'adultPrice',
-              title: 'Adult Price',
+              name: 'package',
+              title: 'Package',
               type: 'string',
-              description: 'Flexible format: RM1,699 or RM1,699/pax',
+              description: 'Example: 2D1N, 3D2N',
             },
-
-            // Child Price
-            {
-              name: 'childPrice',
-              title: 'Child Price',
-              type: 'string',
-              description: 'Flexible format: RM849 or RM849/pax',
-            },
-
-
-            // Notes (optional)
-            {
-              name: 'notes',
-              title: 'Notes / Details',
-              type: 'object',
-              fields: [
-                { name: 'en', title: 'English', type: 'text', rows: 2, description: 'Extra info like flight excluded, age ranges' },
-                { name: 'ms', title: 'Malay', type: 'text', rows: 2, description: 'Maklumat tambahan seperti penerbangan tidak termasuk, umur' },
-              ],
-            },
+            { name: 'adult', title: 'Adult Rate', type: 'string' },
+            { name: 'child', title: 'Child Rate', type: 'string' },
           ],
-
-          // Preview: show group size + prices
           preview: {
-            select: {
-              groupSizeEn: 'groupSize.en',
-              adultPrice: 'adultPrice',
-              childPrice: 'childPrice',
-            },
-            prepare({ groupSizeEn, adultPrice, childPrice }) {
-              let subtitle = adultPrice || ''
-              if (childPrice) subtitle += ` | Child: ${childPrice}`
+            select: { title: 'package', adult: 'adult', child: 'child' },
+            prepare({ title, adult, child }) {
               return {
-                title: groupSizeEn || 'Package',
-                subtitle,
+                title,
+                subtitle: `${adult || ''} | ${child || ''}`,
               }
             },
           },
@@ -157,182 +125,86 @@ export default defineType({
       ],
     }),
 
+    // =========================
+    // ✅ GROUP PRICING
+    // =========================
     defineField({
-      name: 'pricingByMarket',
-      title: 'Pricing by Market',
+      name: 'groupPricing',
+      title: 'Group Pricing',
       type: 'array',
+      hidden: ({ document }) => document?.pricingType !== 'group',
       of: [
         {
           type: 'object',
           fields: [
             {
-              name: 'marketType',
-              title: 'Market Type',
+              name: 'groupPax',
+              title: 'Group Pax',
               type: 'string',
-              options: {
-                list: [
-                  { title: 'Malaysian', value: 'malaysian' },
-                  { title: 'International', value: 'international' },
-                ],
-                layout: 'radio',
-              },
+              description: 'Example: 10 pax and above',
             },
-
-            {
-              name: 'groupSize',
-              title: 'Group / Package',
-              type: 'object',
-              fields: [
-                { name: 'en', title: 'English', type: 'string' },
-                { name: 'ms', title: 'Malay', type: 'string' },
-              ],
-            },
-
-            {
-              name: 'adultPrice',
-              title: 'Adult Price',
-              type: 'string',
-            },
-
-            {
-              name: 'childPrice',
-              title: 'Child Price',
-              type: 'string',
-            },
-
-            {
-              name: 'notes',
-              title: 'Notes / Details',
-              type: 'object',
-              fields: [
-                { name: 'en', title: 'English', type: 'text', rows: 2 },
-                { name: 'ms', title: 'Malay', type: 'text', rows: 2 },
-              ],
-            },
+            { name: 'adult', title: 'Adult Rate', type: 'string' },
+            { name: 'child', title: 'Child Rate', type: 'string' },
           ],
-
-          preview: {
-            select: {
-              market: 'marketType',
-              groupSizeEn: 'groupSize.en',
-              adultPrice: 'adultPrice',
-              childPrice: 'childPrice',
-            },
-            prepare({ market, groupSizeEn, adultPrice, childPrice }) {
-              let subtitle = adultPrice || ''
-              if (childPrice) subtitle += ` | Child: ${childPrice}`
-
-              return {
-                title: `${market ? market.toUpperCase() : ''} - ${groupSizeEn || 'Package'}`,
-                subtitle,
-              }
-            },
-          },
         },
       ],
     }),
-    
+
+    // =========================
+    // ✅ MARKET PRICING
+    // =========================
     defineField({
-      name: 'accommodationPricing',
+      name: 'marketPricing',
+      title: 'Market Pricing',
+      type: 'array',
+      hidden: ({ document }) => document?.pricingType !== 'market',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'groupPax',
+              title: 'Group Pax',
+              type: 'string',
+            },
+            { name: 'malaysian', title: 'Malaysian Rate', type: 'string' },
+            { name: 'international', title: 'International Rate', type: 'string' },
+          ],
+        },
+      ],
+    }),
+
+    // =========================
+    // ✅ ACCOMMODATION PRICING
+    // =========================
+    defineField({
+      name: 'accommodationPricingSimple',
       title: 'Accommodation Pricing',
       type: 'array',
+      hidden: ({ document }) => document?.pricingType !== 'accommodation',
       of: [
         {
           type: 'object',
           fields: [
             {
-              name: 'accommodationType',
-              title: 'Accommodation Type',
-              type: 'object',
-              fields: [
-                { name: 'en', title: 'English', type: 'string', description: 'Example: "Deluxe King / Cabin / Hostel / Deluxe Queen"' },
-                { name: 'ms', title: 'Malay', type: 'string', description: 'Contoh: "Deluxe King / Kabin / Asrama / Deluxe Queen"' },
-              ],
+              name: 'accommodation',
+              title: 'Accommodation',
+              type: 'string',
+              description: 'Example: Deluxe Room / Chalet',
             },
             {
               name: 'price',
-              title: 'Price',
+              title: 'Price Per Person',
               type: 'string',
-              description: 'Flexible format: RM price or N/A',
-            },
-            {
-              name: 'notes',
-              title: 'Notes / Details',
-              type: 'object',
-              fields: [
-                { name: 'en', title: 'English', type: 'text', rows: 2, description: 'Extra info for this accommodation' },
-                { name: 'ms', title: 'Malay', type: 'text', rows: 2, description: 'Maklumat tambahan untuk penginapan ini' },
-              ],
             },
           ],
-          preview: {
-            select: {
-              accommodationEn: 'accommodationType.en',
-              price: 'price',
-            },
-            prepare({ accommodationEn, price }) {
-              return {
-                title: accommodationEn,
-                subtitle: price || '',
-              }
-            },
-          },
         },
       ],
-          }),
-          
-    defineField({
-        name: 'pricingpackage',
-        title: 'Pricing Package',
-        type: 'array',
-        of: [
-          {
-            type: 'object',
-            fields: [
-              // Package name (dual language)
-              {
-                name: 'package',
-                title: 'Package',
-                type: 'object',
-                fields: [
-                  { name: 'en', title: 'English', type: 'string',  description: 'example: 2 DAY 1 NIGHT' },
-                  { name: 'ms', title: 'Malay', type: 'string',  description: 'example: 2 Hari 1 Malam' },
-                ],
-              },
+    }),
 
-              // Adult price (single value)
-              {
-                name: 'adult',
-                title: 'Adult Rate',
-                type: 'string',
-                description: 'Adult rate, e.g., RM1,699',
-              },
-
-              // Child price (single value)
-              {
-                name: 'child',
-                title: 'Child Rate',
-                type: 'string',
-                description: 'Child rate (3–11 Y/O), e.g., RM849',
-              },
-            ],
-
-            preview: {
-              select: {
-                pkg: 'package.en',
-                adult: 'adult',
-                child: 'child',
-              },
-              prepare({ pkg, adult, child }) {
-                return {
-                  title: pkg,
-                  subtitle: `${adult || ''} | ${child || ''}`,
-                }
-              },
-            },
-          },
-        ],
-      }),
+    // =========================
+    // 📝 NOTES (SHARED)
+    // =========================
 
    defineField({
       name: 'notes',
