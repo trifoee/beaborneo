@@ -1,5 +1,15 @@
 import { defineField, defineType } from 'sanity'
 
+const dualString = (name, title, description = '') => ({
+  name,
+  title,
+  type: 'object',
+  fields: [
+    { name: 'en', title: 'English', type: 'string', description },
+    { name: 'ms', title: 'Malay', type: 'string', description },
+  ],
+})
+
 export default defineType({
   name: 'tour',
   title: 'Tour',
@@ -75,6 +85,9 @@ export default defineType({
       options: { hotspot: true },
     }),
 
+    // =========================
+    // 🎯 PRICING TYPE
+    // =========================
     defineField({
       name: 'pricingType',
       title: 'Pricing Type',
@@ -103,20 +116,20 @@ export default defineType({
         {
           type: 'object',
           fields: [
-            {
-              name: 'package',
-              title: 'Package',
-              type: 'string',
-              description: 'Example: 2D1N, 3D2N',
-            },
+            dualString('package', 'Package', 'Example: 2D1N / 3D2N'),
+
             { name: 'adult', title: 'Adult Rate', type: 'string' },
             { name: 'child', title: 'Child Rate', type: 'string' },
           ],
           preview: {
-            select: { title: 'package', adult: 'adult', child: 'child' },
+            select: {
+              title: 'package.en',
+              adult: 'adult',
+              child: 'child',
+            },
             prepare({ title, adult, child }) {
               return {
-                title,
+                title: title || 'Package',
                 subtitle: `${adult || ''} | ${child || ''}`,
               }
             },
@@ -137,15 +150,24 @@ export default defineType({
         {
           type: 'object',
           fields: [
-            {
-              name: 'groupPax',
-              title: 'Group Pax',
-              type: 'string',
-              description: 'Example: 10 pax and above',
-            },
+            dualString('groupPax', 'Group Pax', 'Example: 10 pax and above'),
+
             { name: 'adult', title: 'Adult Rate', type: 'string' },
             { name: 'child', title: 'Child Rate', type: 'string' },
           ],
+          preview: {
+            select: {
+              title: 'groupPax.en',
+              adult: 'adult',
+              child: 'child',
+            },
+            prepare({ title, adult, child }) {
+              return {
+                title: title || 'Group',
+                subtitle: `${adult || ''} | ${child || ''}`,
+              }
+            },
+          },
         },
       ],
     }),
@@ -162,14 +184,24 @@ export default defineType({
         {
           type: 'object',
           fields: [
-            {
-              name: 'groupPax',
-              title: 'Group Pax',
-              type: 'string',
-            },
+            dualString('groupPax', 'Group Pax'),
+
             { name: 'malaysian', title: 'Malaysian Rate', type: 'string' },
             { name: 'international', title: 'International Rate', type: 'string' },
           ],
+          preview: {
+            select: {
+              title: 'groupPax.en',
+              malaysian: 'malaysian',
+              international: 'international',
+            },
+            prepare({ title, malaysian, international }) {
+              return {
+                title: title || 'Market',
+                subtitle: `${malaysian || ''} | ${international || ''}`,
+              }
+            },
+          },
         },
       ],
     }),
@@ -186,18 +218,30 @@ export default defineType({
         {
           type: 'object',
           fields: [
-            {
-              name: 'accommodation',
-              title: 'Accommodation',
-              type: 'string',
-              description: 'Example: Deluxe Room / Chalet',
-            },
+            dualString(
+              'accommodation',
+              'Accommodation',
+              'Example: Deluxe Room / Chalet'
+            ),
+
             {
               name: 'price',
               title: 'Price Per Person',
               type: 'string',
             },
           ],
+          preview: {
+            select: {
+              title: 'accommodation.en',
+              price: 'price',
+            },
+            prepare({ title, price }) {
+              return {
+                title: title || 'Accommodation',
+                subtitle: price || '',
+              }
+            },
+          },
         },
       ],
     }),
