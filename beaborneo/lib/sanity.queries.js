@@ -1,80 +1,32 @@
-/**
- * Sanity GROQ Queries
- * 
- * All GROQ queries for fetching content from Sanity CMS.
- * These queries are designed to work with the localized content structure.
- * 
- * TODO: Uncomment and use when Sanity is integrated
- */
-
-// import { sanityClient } from './sanity.client';
+import { sanityClient } from './sanity.client';
 
 /**
- * Query for site settings (global settings like site name, logo, etc.)
- */
-export const siteSettingsQuery = `
-  *[_type == "settings"][0] {
-    siteName,
-    logo,
-    "logoUrl": logo.asset->url,
-    socialLinks,
-    contactInfo
-  }
-`;
-
-/**
- * Query for home page content
- */
-export const homePageQuery = `
-  *[_type == "home"][0] {
-    hero {
-      title,
-      subtitle,
-      backgroundImage,
-      "backgroundImageUrl": backgroundImage.asset->url,
-      ctaText,
-      ctaLink
-    },
-    featuredToursTitle,
-    featuredTours[]-> {
-      _id,
-      title,
-      slug,
-      "mainImageUrl": mainImage.asset->url,
-      shortDescription,
-      duration,
-      price
-    },
-    testimonials[] {
-      name,
-      quote,
-      location,
-      "avatarUrl": avatar.asset->url
-    },
-    seo
-  }
-`;
-
-/**
- * Query for all tours (list view)
+ * All tours for listing page.
+ * Fetches enough data for cards + filtering.
+ * Grabs the first entry from whichever pricing array is active
+ * so we can derive a "starting from" price on the card.
  */
 export const allToursQuery = `
-  *[_type == "tour"] | order(orderRank) {
+  *[_type == "tour"] | order(_createdAt desc) {
     _id,
     title,
     slug,
     "mainImageUrl": mainImage.asset->url,
-    shortDescription,
+    tagline,
     duration,
-    price,
-    category,
-    highlights
+    tourType,
+    location,
+    featured,
+    pricingType,
+    packagePricing[0]{ adult, child },
+    groupPricing[0]{ adult, child },
+    marketPricing[0]{ malaysian, international },
+    accommodationPricingSimple[0]{ price }
   }
 `;
 
 /**
- * Query for single tour by slug
- * @param {string} slug - Tour slug
+ * Single tour by slug — full detail.
  */
 export const tourBySlugQuery = `
   *[_type == "tour" && slug.current == $slug][0] {
@@ -82,77 +34,62 @@ export const tourBySlugQuery = `
     title,
     slug,
     "mainImageUrl": mainImage.asset->url,
-    description,
-    shortDescription,
+    tagline,
+    overview,
     duration,
-    price,
-    category,
+    tourType,
+    location,
+    featured,
+    pricingType,
+    packagePricing,
+    groupPricing,
+    marketPricing,
+    accommodationPricingSimple,
+    notes,
+    itinerary,
     highlights,
-    itinerary[] {
-      day,
-      title,
-      description,
-      "imageUrl": image.asset->url
-    },
-    inclusions,
-    exclusions,
-    gallery[] {
-      "url": asset->url,
-      alt,
-      caption
-    },
-    seo
+    included,
+    notIncluded,
+    gallery[]{ "url": asset->url },
+    "brochureUrl": brochure.asset->url
   }
 `;
 
 /**
- * Query for page by slug (About, Contact, etc.)
- * @param {string} slug - Page slug
+ * All tour slugs — for generateStaticParams.
  */
-export const pageBySlugQuery = `
-  *[_type == "page" && slug.current == $slug][0] {
-    _id,
-    title,
-    slug,
-    content,
-    "heroImageUrl": heroImage.asset->url,
-    seo
-  }
+export const allTourSlugsQuery = `
+  *[_type == "tour"]{ "slug": slug.current }
 `;
 
-/**
- * Query for navigation items
- */
-export const navigationQuery = `
-  *[_type == "settings"][0].navigation[] {
-    title,
-    link,
-    isExternal
+// --------------- transport service queries ---------------
+
+export const transportServicesByTypeQuery = `{
+  "selfDrive": *[_type == "transportService" && type == "self_drive"] | order(title asc) {
+    _id, title, carModel, dailyPrice, discount3Days
+  },
+  "privateTransfer": *[_type == "transportService" && type == "private_transfer"] | order(title asc) {
+    _id, title, route, dayTimePrice, nightTimePrice
+  },
+  "privateTour": *[_type == "transportService" && type == "private_tour"] | order(title asc) {
+    _id, title, route, packages
   }
-`;
+}`;
 
-/**
- * Placeholder data fetching functions
- * TODO: Replace with actual Sanity fetches when CMS is integrated
- */
+// --------------- fetch helpers ---------------
 
-// Example fetch function structure:
-// export async function getHomePage() {
-//   return sanityClient.fetch(homePageQuery);
-// }
+export async function getAllTours() {
+  return sanityClient.fetch(allToursQuery);
+}
 
-// export async function getAllTours() {
-//   return sanityClient.fetch(allToursQuery);
-// }
+export async function getTourBySlug(slug) {
+  return sanityClient.fetch(tourBySlugQuery, { slug });
+}
 
-// export async function getTourBySlug(slug) {
-//   return sanityClient.fetch(tourBySlugQuery, { slug });
-// }
+export async function getAllTourSlugs() {
+  return sanityClient.fetch(allTourSlugsQuery);
+}
 
-// export async function getPageBySlug(slug) {
-//   return sanityClient.fetch(pageBySlugQuery, { slug });
-// }
-
-// export async function getSiteSettings() {
-//   return sanityClient.fetch(siteSettingsQuery);
-// }
+export async function getTransportServices() {
+  return sanityClient.fetch(transportServicesByTypeQuery);
+}

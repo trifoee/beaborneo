@@ -1,6 +1,6 @@
 export default {
   name: 'transportService',
-  title: 'Trasport Service',
+  title: 'Transport Service',
   type: 'document',
   fields: [
     {
