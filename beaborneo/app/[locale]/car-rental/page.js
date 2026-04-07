@@ -3,15 +3,19 @@
  *
  * Self-drive rental fleet, private transfers, and private tours
  * with driver-guide — pricing and details from Bea Borneo.
- * TODO: Replace hardcoded content with CMS data when Sanity is integrated
+ *
+ * Self-drive: hardcoded (CMS only has 2 of 17+ vehicles, no category field)
+ * Private transfers: from CMS
+ * Private tours: from CMS + hardcoded fallback for missing routes
  */
 
 import { generateMetadata as generateSeoMetadata } from '@/lib/seo';
 import { getLocalizedValue } from '@/lib/i18n';
+import { getTransportServices } from '@/lib/sanity.queries';
 import Button from '@/components/ui/Button';
 
 /* ------------------------------------------------------------------ */
-/*  Content / Data                                                     */
+/*  Static content / fallbacks                                         */
 /* ------------------------------------------------------------------ */
 
 const pageContent = {
@@ -41,6 +45,7 @@ const pageContent = {
   },
 };
 
+/* Self-drive fleet stays hardcoded — CMS only has 2 vehicles and no category field */
 const selfDriveFleet = [
   {
     category: { en: 'Economy & Compact', ms: 'Ekonomi & Kompak', id: 'Ekonomi & Kompak' },
@@ -91,51 +96,11 @@ const selfDriveFleet = [
   },
 ];
 
-const privateTransfers = [
+/* Hardcoded fallback for private tours missing from CMS */
+const fallbackPrivateTours = [
   {
-    route: {
-      en: 'Airport / Jetty Transfer — Kota Kinabalu (One Way)',
-      ms: 'Pemindahan Lapangan Terbang / Jeti — Kota Kinabalu (Sehala)',
-      id: 'Transfer Bandara / Dermaga — Kota Kinabalu (Sekali Jalan)',
-    },
-    dayPrice: 'RM 100',
-    nightPrice: 'RM 150',
-  },
-  {
-    route: {
-      en: 'Airport Transfer — Tawau to Semporna (One Way)',
-      ms: 'Pemindahan Lapangan Terbang — Tawau ke Semporna (Sehala)',
-      id: 'Transfer Bandara — Tawau ke Semporna (Sekali Jalan)',
-    },
-    dayPrice: 'RM 200',
-    nightPrice: 'RM 300',
-  },
-];
-
-const privateTours = [
-  {
-    route: {
-      en: 'Kota Kinabalu — Kundasang',
-      ms: 'Kota Kinabalu — Kundasang',
-      id: 'Kota Kinabalu — Kundasang',
-    },
-    prices: { '2D1N': 'RM 950', '3D2N': 'RM 1,250', '4D3N': 'RM 1,450', '5D4N': 'RM 1,650' },
-  },
-  {
-    route: {
-      en: 'Kota Kinabalu — Tawau',
-      ms: 'Kota Kinabalu — Tawau',
-      id: 'Kota Kinabalu — Tawau',
-    },
-    prices: { '2D1N': 'RM 2,500', '3D2N': 'RM 2,900', '4D3N': 'RM 3,500', '5D4N': 'RM 4,500' },
-  },
-  {
-    route: {
-      en: 'Kota Kinabalu — Semporna',
-      ms: 'Kota Kinabalu — Semporna',
-      id: 'Kota Kinabalu — Semporna',
-    },
-    prices: { '2D1N': 'RM 2,500', '3D2N': 'RM 3,400', '4D3N': 'RM 4,000', '5D4N': 'RM 5,500' },
+    route: 'Kota Kinabalu — Semporna',
+    packages: { twoDayOneNight: 'RM 2,500', threeDayTwoNight: 'RM 3,400', fourDayThreeNight: 'RM 4,000', fiveDayFourNight: 'RM 5,500' },
   },
 ];
 
@@ -260,6 +225,23 @@ export async function generateMetadata({ params }) {
 export default async function CarRentalPage({ params }) {
   const { locale } = await params;
 
+  let transport = { selfDrive: [], privateTransfer: [], privateTour: [] };
+  try {
+    transport = (await getTransportServices()) || transport;
+  } catch (err) {
+    console.error('Failed to fetch transport services:', err);
+  }
+
+  const transfers = transport.privateTransfer?.length > 0
+    ? transport.privateTransfer
+    : [];
+
+  const cmsRoutes = new Set((transport.privateTour || []).map((t) => t.route));
+  const privateTours = [
+    ...(transport.privateTour || []),
+    ...fallbackPrivateTours.filter((f) => !cmsRoutes.has(f.route)),
+  ];
+
   return (
     <div className="car-rental-page">
       {/* ── Hero ─────────────────────────────────────────────────── */}
@@ -295,7 +277,7 @@ export default async function CarRentalPage({ params }) {
         </div>
       </section>
 
-      {/* ── Self-Drive Fleet ─────────────────────────────────────── */}
+      {/* ── Self-Drive Fleet (hardcoded) ─────────────────────────── */}
       <section className="py-20 md:py-32">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center mb-16">
@@ -314,14 +296,12 @@ export default async function CarRentalPage({ params }) {
             </p>
           </div>
 
-          {/* Fleet Grid – one card per category */}
           <div className="space-y-6">
             {selfDriveFleet.map((group, gIndex) => (
               <div
                 key={gIndex}
                 className="bg-white rounded-3xl border border-gray-100 shadow-sm hover:shadow-lg transition-shadow duration-300 overflow-hidden"
               >
-                {/* Category Header */}
                 <div className="flex items-center gap-3 px-6 md:px-8 py-5 bg-stone-50 border-b border-gray-100">
                   <div className="w-9 h-9 rounded-xl bg-[#E31E24]/10 text-[#E31E24] flex items-center justify-center">
                     {categoryIcons[getLocalizedValue(group.category, 'en')]}
@@ -331,20 +311,19 @@ export default async function CarRentalPage({ params }) {
                   </h3>
                 </div>
 
-                {/* Pricing Table */}
                 <div className="overflow-x-auto">
                   <table className="w-full text-left">
                     <thead>
                       <tr className="text-xs uppercase tracking-wider text-gray-400 border-b border-gray-100">
                         <th className="px-6 md:px-8 py-3 font-semibold">
-                          {locale === 'en' ? 'Model' : locale === 'ms' ? 'Model' : 'Model'}
+                          {locale === 'en' ? 'Model' : 'Model'}
                         </th>
                         <th className="px-6 md:px-8 py-3 font-semibold text-right">
                           {locale === 'en' ? 'Daily Rate' : locale === 'ms' ? 'Kadar Harian' : 'Tarif Harian'}
                         </th>
                         <th className="px-6 md:px-8 py-3 font-semibold text-right">
                           <span className="inline-flex items-center gap-1">
-                            {locale === 'en' ? '3+ Days' : locale === 'ms' ? '3+ Hari' : '3+ Hari'}
+                            {locale === 'en' ? '3+ Days' : '3+ Hari'}
                             <span className="ml-1 px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-[10px] font-bold normal-case">
                               {locale === 'en' ? 'Save' : locale === 'ms' ? 'Jimat' : 'Hemat'}
                             </span>
@@ -358,15 +337,9 @@ export default async function CarRentalPage({ params }) {
                           key={vIndex}
                           className="border-b border-gray-50 last:border-b-0 hover:bg-red-50/30 transition-colors"
                         >
-                          <td className="px-6 md:px-8 py-4 font-medium text-gray-900">
-                            {v.model}
-                          </td>
-                          <td className="px-6 md:px-8 py-4 text-right text-gray-700 font-semibold">
-                            {v.daily}
-                          </td>
-                          <td className="px-6 md:px-8 py-4 text-right font-bold text-[#E31E24]">
-                            {v.multiDay}
-                          </td>
+                          <td className="px-6 md:px-8 py-4 font-medium text-gray-900">{v.model}</td>
+                          <td className="px-6 md:px-8 py-4 text-right text-gray-700 font-semibold">{v.daily}</td>
+                          <td className="px-6 md:px-8 py-4 text-right font-bold text-[#E31E24]">{v.multiDay}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -386,142 +359,154 @@ export default async function CarRentalPage({ params }) {
         </div>
       </section>
 
-      {/* ── Private Transfers ────────────────────────────────────── */}
-      <section className="py-20 md:py-32 bg-stone-50">
-        <div className="container mx-auto px-4 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
-            {/* Left – info */}
-            <div>
-              <span className="inline-block px-4 py-1.5 bg-red-50 text-[#E31E24] rounded-full text-sm font-semibold mb-4">
-                {locale === 'en' ? '• Private Transfer' : '• Pemindahan Persendirian'}
-              </span>
-              <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-                {locale === 'en' ? 'Airport & Jetty Transfers' : locale === 'ms' ? 'Pemindahan Lapangan Terbang & Jeti' : 'Transfer Bandara & Dermaga'}
-              </h2>
-              <p className="text-gray-600 text-lg leading-relaxed mb-8">
-                {locale === 'en'
-                  ? 'Start or end your Sabah trip stress-free with our reliable point-to-point private transfers. Available day and night with professional, courteous drivers.'
-                  : locale === 'ms'
-                    ? 'Mulakan atau akhiri perjalanan Sabah anda tanpa tekanan dengan pemindahan persendirian kami yang boleh dipercayai. Tersedia siang dan malam dengan pemandu profesional dan berbudi bahasa.'
-                    : 'Mulai atau akhiri perjalanan Sabah Anda tanpa stres dengan transfer privat kami yang andal. Tersedia siang dan malam dengan sopir profesional dan ramah.'}
-              </p>
+      {/* ── Private Transfers (from CMS) ─────────────────────────── */}
+      {transfers.length > 0 && (
+        <section className="py-20 md:py-32 bg-stone-50">
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+              <div>
+                <span className="inline-block px-4 py-1.5 bg-red-50 text-[#E31E24] rounded-full text-sm font-semibold mb-4">
+                  {locale === 'en' ? '• Private Transfer' : '• Pemindahan Persendirian'}
+                </span>
+                <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+                  {locale === 'en' ? 'Airport & Jetty Transfers' : locale === 'ms' ? 'Pemindahan Lapangan Terbang & Jeti' : 'Transfer Bandara & Dermaga'}
+                </h2>
+                <p className="text-gray-600 text-lg leading-relaxed mb-8">
+                  {locale === 'en'
+                    ? 'Start or end your Sabah trip stress-free with our reliable point-to-point private transfers. Available day and night with professional, courteous drivers.'
+                    : locale === 'ms'
+                      ? 'Mulakan atau akhiri perjalanan Sabah anda tanpa tekanan dengan pemindahan persendirian kami yang boleh dipercayai. Tersedia siang dan malam dengan pemandu profesional dan berbudi bahasa.'
+                      : 'Mulai atau akhiri perjalanan Sabah Anda tanpa stres dengan transfer privat kami yang andal. Tersedia siang dan malam dengan sopir profesional dan ramah.'}
+                </p>
 
-              <div className="flex items-center gap-3 text-sm text-gray-500 mb-2">
-                <span className="w-3 h-3 rounded-full bg-amber-400" />
-                <span className="font-medium">{locale === 'en' ? 'Day Rate' : locale === 'ms' ? 'Kadar Siang' : 'Tarif Siang'}: 7:00 AM – 5:00 PM</span>
+                <div className="flex items-center gap-3 text-sm text-gray-500 mb-2">
+                  <span className="w-3 h-3 rounded-full bg-amber-400" />
+                  <span className="font-medium">{locale === 'en' ? 'Day Rate' : locale === 'ms' ? 'Kadar Siang' : 'Tarif Siang'}: 7:00 AM – 5:00 PM</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-gray-500">
+                  <span className="w-3 h-3 rounded-full bg-indigo-500" />
+                  <span className="font-medium">{locale === 'en' ? 'Night Rate' : locale === 'ms' ? 'Kadar Malam' : 'Tarif Malam'}: 5:30 PM – 12:01 AM</span>
+                </div>
               </div>
-              <div className="flex items-center gap-3 text-sm text-gray-500">
-                <span className="w-3 h-3 rounded-full bg-indigo-500" />
-                <span className="font-medium">{locale === 'en' ? 'Night Rate' : locale === 'ms' ? 'Kadar Malam' : 'Tarif Malam'}: 5:30 PM – 12:01 AM</span>
-              </div>
-            </div>
 
-            {/* Right – pricing cards */}
-            <div className="space-y-4">
-              {privateTransfers.map((transfer, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm"
-                >
-                  <h4 className="font-heading font-bold text-gray-900 mb-5">
-                    {getLocalizedValue(transfer.route, locale)}
-                  </h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-amber-50 rounded-xl p-4 text-center">
-                      <div className="flex items-center justify-center gap-2 mb-2">
-                        <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-                        <span className="text-xs font-semibold uppercase tracking-wider text-amber-700">
-                          {locale === 'en' ? 'Day' : locale === 'ms' ? 'Siang' : 'Siang'}
-                        </span>
+              <div className="space-y-4">
+                {transfers.map((transfer) => (
+                  <div
+                    key={transfer._id}
+                    className="bg-white rounded-2xl p-6 md:p-8 border border-gray-100 shadow-sm"
+                  >
+                    <h4 className="font-heading font-bold text-gray-900 mb-5">
+                      {transfer.route}
+                    </h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-amber-50 rounded-xl p-4 text-center">
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                          <span className="text-xs font-semibold uppercase tracking-wider text-amber-700">
+                            {locale === 'en' ? 'Day' : 'Siang'}
+                          </span>
+                        </div>
+                        <span className="text-2xl font-bold text-gray-900">{transfer.dayTimePrice}</span>
                       </div>
-                      <span className="text-2xl font-bold text-gray-900">{transfer.dayPrice}</span>
-                    </div>
-                    <div className="bg-indigo-50 rounded-xl p-4 text-center">
-                      <div className="flex items-center justify-center gap-2 mb-2">
-                        <span className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
-                        <span className="text-xs font-semibold uppercase tracking-wider text-indigo-700">
-                          {locale === 'en' ? 'Night' : locale === 'ms' ? 'Malam' : 'Malam'}
-                        </span>
+                      <div className="bg-indigo-50 rounded-xl p-4 text-center">
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                          <span className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
+                          <span className="text-xs font-semibold uppercase tracking-wider text-indigo-700">
+                            {locale === 'en' ? 'Night' : 'Malam'}
+                          </span>
+                        </div>
+                        <span className="text-2xl font-bold text-gray-900">{transfer.nightTimePrice}</span>
                       </div>
-                      <span className="text-2xl font-bold text-gray-900">{transfer.nightPrice}</span>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* ── Private Tour with Driver-Guide ───────────────────────── */}
-      <section className="py-20 md:py-32 bg-gray-950 text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#E31E24]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+      {/* ── Private Tour with Driver-Guide (CMS + fallback) ──────── */}
+      {privateTours.length > 0 && (
+        <section className="py-20 md:py-32 bg-gray-950 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#E31E24]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
 
-        <div className="relative z-10 container mx-auto px-4 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1.5 bg-white/10 text-white rounded-full text-sm font-semibold mb-4">
-              {locale === 'en' ? '• Private Tour' : '• Lawatan Persendirian'}
-            </span>
-            <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              {locale === 'en' ? 'Private Tour with Driver & Guide' : locale === 'ms' ? 'Lawatan Persendirian dengan Pemandu' : 'Tur Privat dengan Sopir & Pemandu'}
-            </h2>
-            <p className="text-white/70 text-lg max-w-2xl mx-auto">
+          <div className="relative z-10 container mx-auto px-4 lg:px-8">
+            <div className="text-center mb-16">
+              <span className="inline-block px-4 py-1.5 bg-white/10 text-white rounded-full text-sm font-semibold mb-4">
+                {locale === 'en' ? '• Private Tour' : '• Lawatan Persendirian'}
+              </span>
+              <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+                {locale === 'en' ? 'Private Tour with Driver & Guide' : locale === 'ms' ? 'Lawatan Persendirian dengan Pemandu' : 'Tur Privat dengan Sopir & Pemandu'}
+              </h2>
+              <p className="text-white/70 text-lg max-w-2xl mx-auto">
+                {locale === 'en'
+                  ? 'Sit back and enjoy the scenery while our experienced driver-guide takes you on a personalised multi-day adventure through Sabah.'
+                  : locale === 'ms'
+                    ? 'Duduk dan nikmati pemandangan sementara pemandu kami yang berpengalaman membawa anda dalam pengembaraan pelbagai hari yang diperibadikan melalui Sabah.'
+                    : 'Duduk santai dan nikmati pemandangan sementara sopir-pemandu kami yang berpengalaman membawa Anda dalam petualangan multi-hari yang dipersonalisasi melalui Sabah.'}
+              </p>
+            </div>
+
+            <div className="space-y-6 max-w-4xl mx-auto">
+              {privateTours.map((tour, index) => {
+                const pkg = tour.packages || {};
+                return (
+                  <div
+                    key={tour._id || `fallback-${index}`}
+                    className="bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 hover:border-white/20 transition-all duration-300 overflow-hidden"
+                  >
+                    <div className="px-6 md:px-8 py-5 border-b border-white/10">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-[#E31E24]/20 text-[#ff6b6f] flex items-center justify-center">
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                          </svg>
+                        </div>
+                        <h3 className="font-heading text-lg md:text-xl font-bold text-white">
+                          {tour.route}
+                        </h3>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-white/10">
+                      {[
+                        { label: '2D1N', value: pkg.twoDayOneNight },
+                        { label: '3D2N', value: pkg.threeDayTwoNight },
+                        { label: '4D3N', value: pkg.fourDayThreeNight },
+                        { label: '5D4N', value: pkg.fiveDayFourNight },
+                      ].map(
+                        (col) =>
+                          col.value && (
+                            <div key={col.label} className="px-4 md:px-6 py-5 text-center">
+                              <div className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-2">
+                                {col.label}
+                              </div>
+                              <div className="text-lg md:text-xl font-bold text-white">
+                                {col.value}
+                              </div>
+                            </div>
+                          ),
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <p className="text-center text-sm text-white/30 mt-8">
               {locale === 'en'
-                ? 'Sit back and enjoy the scenery while our experienced driver-guide takes you on a personalised multi-day adventure through Sabah.'
+                ? '* Includes vehicle, fuel, driver-guide, and tolls. Accommodation & meals not included unless specified.'
                 : locale === 'ms'
-                  ? 'Duduk dan nikmati pemandangan sementara pemandu kami yang berpengalaman membawa anda dalam pengembaraan pelbagai hari yang diperibadikan melalui Sabah.'
-                  : 'Duduk santai dan nikmati pemandangan sementara sopir-pemandu kami yang berpengalaman membawa Anda dalam petualangan multi-hari yang dipersonalisasi melalui Sabah.'}
+                  ? '* Termasuk kenderaan, bahan api, pemandu, dan tol. Penginapan & makanan tidak termasuk melainkan dinyatakan.'
+                  : '* Termasuk kendaraan, bahan bakar, sopir-pemandu, dan tol. Akomodasi & makanan tidak termasuk kecuali disebutkan.'}
             </p>
           </div>
+        </section>
+      )}
 
-          {/* Pricing cards */}
-          <div className="space-y-6 max-w-4xl mx-auto">
-            {privateTours.map((tour, index) => (
-              <div
-                key={index}
-                className="bg-white/5 backdrop-blur-sm rounded-3xl border border-white/10 hover:border-white/20 transition-all duration-300 overflow-hidden"
-              >
-                <div className="px-6 md:px-8 py-5 border-b border-white/10">
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-[#E31E24]/20 text-[#ff6b6f] flex items-center justify-center">
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-                      </svg>
-                    </div>
-                    <h3 className="font-heading text-lg md:text-xl font-bold text-white">
-                      {getLocalizedValue(tour.route, locale)}
-                    </h3>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-white/10">
-                  {Object.entries(tour.prices).map(([duration, price]) => (
-                    <div key={duration} className="px-4 md:px-6 py-5 text-center">
-                      <div className="text-xs font-semibold uppercase tracking-wider text-white/40 mb-2">
-                        {duration}
-                      </div>
-                      <div className="text-lg md:text-xl font-bold text-white">
-                        {price}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <p className="text-center text-sm text-white/30 mt-8">
-            {locale === 'en'
-              ? '* Includes vehicle, fuel, driver-guide, and tolls. Accommodation & meals not included unless specified.'
-              : locale === 'ms'
-                ? '* Termasuk kenderaan, bahan api, pemandu, dan tol. Penginapan & makanan tidak termasuk melainkan dinyatakan.'
-                : '* Termasuk kendaraan, bahan bakar, sopir-pemandu, dan tol. Akomodasi & makanan tidak termasuk kecuali disebutkan.'}
-          </p>
-        </div>
-      </section>
-
-      {/* ── Why Rent With Us ─────────────────────────────────────── */}
+      {/* ── Why Rent With Us (hardcoded) ─────────────────────────── */}
       <section className="py-20 md:py-32">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="text-center mb-16">
@@ -554,7 +539,7 @@ export default async function CarRentalPage({ params }) {
         </div>
       </section>
 
-      {/* ── CTA ──────────────────────────────────────────────────── */}
+      {/* ── CTA (hardcoded) ──────────────────────────────────────── */}
       <section className="py-20 md:py-32 bg-[#E31E24]">
         <div className="container mx-auto px-4 lg:px-8 text-center">
           <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
@@ -569,7 +554,7 @@ export default async function CarRentalPage({ params }) {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button href={`/${locale}/contact`} variant="white" size="lg">
-              {locale === 'en' ? 'Contact Us' : locale === 'ms' ? 'Hubungi Kami' : 'Hubungi Kami'}
+              {locale === 'en' ? 'Contact Us' : 'Hubungi Kami'}
             </Button>
             <a
               href="https://wa.me/60182103921"

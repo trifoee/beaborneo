@@ -15,4 +15,8 @@ export default defineConfig({
   schema: {
     types: schemaTypes,
   },
+
+  deployment: {
+    appId: 'y6zbhs54823ryanaqkz08fcm',
+  }
 })

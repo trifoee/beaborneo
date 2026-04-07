@@ -15,10 +15,17 @@
     "sanity"
   ],
   "dependencies": {
+<<<<<<< HEAD
     "@sanity/vision": "^5.18.0",
     "react": "^19.1",
     "react-dom": "^19.1",
     "sanity": "^5.18.0",
+=======
+    "@sanity/vision": "^5.19.0",
+    "react": "^19.1",
+    "react-dom": "^19.1",
+    "sanity": "^5.19.0",
+>>>>>>> development
     "styled-components": "^6.1.18"
   },
   "devDependencies": {
