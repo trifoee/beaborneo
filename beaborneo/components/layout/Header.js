@@ -48,7 +48,7 @@ export default function Header({ locale }) {
           >
             <div className="relative w-12 h-12 rounded-full overflow-hidden shadow-md transition-transform duration-300 group-hover:scale-105">
               <Image
-                src="/bea_borneo_logo.png"
+                src="/images/logo.png"
                 alt="BEA Borneo"
                 width={48}
                 height={48}
