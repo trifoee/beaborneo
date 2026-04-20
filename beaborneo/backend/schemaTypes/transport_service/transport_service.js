@@ -22,25 +22,52 @@ export default {
     },
 
     // =========================
-    // 🚗 SELF DRIVE
+    // SELF DRIVE
     // =========================
     {
-      name: 'carModel',
-      title: 'Car Model',
+      name: 'category',
+      title: 'Vehicle Category',
       type: 'string',
+      options: {
+        list: [
+          { title: 'Economy & Compact', value: 'economy_compact' },
+          { title: 'Sedan', value: 'sedan' },
+          { title: 'MPV & Family', value: 'mpv_family' },
+          { title: 'Pickup & 4WD', value: 'pickup_4wd' },
+          { title: 'Van & Group', value: 'van_group' },
+          { title: 'Premium', value: 'premium' },
+        ],
+      },
       hidden: ({ document }) => document?.type !== 'self_drive',
     },
     {
-      name: 'dailyPrice',
-      title: 'Daily Rental Price',
-      type: 'string',
-      hidden: ({ document }) => document?.type !== 'self_drive',
-    },
-    {
-      name: 'discount3Days',
-      title: 'Discount (3 Days & Above)',
-      type: 'string',
-      description: 'Enter percentage (%)',
+      name: 'vehicles',
+      title: 'Vehicles in Category',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          name: 'vehicle',
+          fields: [
+            {
+              name: 'model',
+              title: 'Car Model',
+              type: 'string',
+            },
+            {
+              name: 'dailyPrice',
+              title: 'Daily Rental Price',
+              type: 'string',
+            },
+            {
+              name: 'multiDayPrice',
+              title: 'Price (3 Days & Above)',
+              type: 'string',
+              description: 'Discounted price for 3 days or more',
+            },
+          ],
+        },
+      ],
       hidden: ({ document }) => document?.type !== 'self_drive',
     },
 
@@ -56,15 +83,17 @@ export default {
         document?.type !== 'private_tour',
     },
     {
-      name: 'dayTimePrice',
-      title: 'Price (7:00 AM - 5:00 PM)',
+      name: 'timeAPrice',
+      title: 'Time A Price',
       type: 'string',
+      description: 'Price for Time A (e.g., morning/day rate)',
       hidden: ({ document }) => document?.type !== 'private_transfer',
     },
     {
-      name: 'nightTimePrice',
-      title: 'Price (5:30 PM - 12:00 AM)',
+      name: 'timeBPrice',
+      title: 'Time B Price',
       type: 'string',
+      description: 'Price for Time B (e.g., evening/night rate)',
       hidden: ({ document }) => document?.type !== 'private_transfer',
     },
 
