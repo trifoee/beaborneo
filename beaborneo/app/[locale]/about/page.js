@@ -331,21 +331,21 @@ export default async function AboutPage({ params }) {
             <div className="relative">
               <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
                 <ImageBlock
-                  src="/images/about/team.png"
+                  src="/images/about/team_ai.png"
                   alt="Bea Borneo Travel Team"
                   fill
                   className="object-cover object-top"
                   priority
                 />
               </div>
-              <div className="absolute -bottom-8 -right-4 md:-right-8 w-48 md:w-64 aspect-[4/3] rounded-2xl overflow-hidden shadow-xl border-4 border-white">
+              {/* <div className="absolute -bottom-8 -right-4 md:-right-8 w-48 md:w-64 aspect-[4/3] rounded-2xl overflow-hidden shadow-xl border-4 border-white">
                 <ImageBlock
-                  src="/images/about/teamwork.jpeg"
+                  src="/images/about/logo.png"
                   alt="Teamwork and collaboration"
                   fill
                   className="object-cover"
                 />
-              </div>
+              </div> */}
             </div>
 
             <div>
@@ -580,7 +580,7 @@ export default async function AboutPage({ params }) {
             <div className="relative">
               <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-xl">
                 <ImageBlock
-                  src="/images/about/partnership.jpeg"
+                  src="/images/about/beaborneo_motac_license.png"
                   alt="Professional partnership and trust"
                   fill
                   className="object-cover"
