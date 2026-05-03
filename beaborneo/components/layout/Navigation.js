@@ -18,7 +18,7 @@ export default function Navigation({ locale, isMobile = false, isScrolled = fals
     { label: t(locale, 'navigation.home'), href: `/${locale}` },
     { label: t(locale, 'navigation.tours'), href: `/${locale}/tours` },
     { label: t(locale, 'navigation.carRental'), href: `/${locale}/car-rental` },
-    { label: t(locale, 'navigation.events'), href: `/${locale}/events` },
+    // { label: t(locale, 'navigation.events'), href: `/${locale}/events` },
     { label: t(locale, 'navigation.about'), href: `/${locale}/about` },
     { label: t(locale, 'navigation.contact'), href: `/${locale}/contact` },
   ];
