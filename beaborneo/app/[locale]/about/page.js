@@ -331,7 +331,7 @@ export default async function AboutPage({ params }) {
             <div className="relative">
               <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
                 <ImageBlock
-                  src="/images/about/team_ai.png"
+                  src="/images/about/team.png"
                   alt="Bea Borneo Travel Team"
                   fill
                   className="object-cover object-top"
