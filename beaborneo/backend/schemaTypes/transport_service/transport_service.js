@@ -58,21 +58,28 @@ export default {
               name: 'dailyPrice',
               title: 'Daily Rental Price',
               type: 'string',
+              description: 'Standard daily rate (e.g. RM150)',
             },
             {
               name: 'multiDayPrice',
-              title: 'Price (3 Days & Above)',
+              title: 'Discounted Rate (3+ Days)',
               type: 'string',
-              description: 'Discounted price for 3 days or more',
+              description: 'Discounted daily rate when booked for 3 days or more',
             },
           ],
+          preview: {
+            select: {
+              title: 'model',
+              subtitle: 'dailyPrice',
+            },
+          },
         },
       ],
       hidden: ({ document }) => document?.type !== 'self_drive',
     },
 
     // =========================
-    // 🚐 PRIVATE TRANSFER
+    // PRIVATE TRANSFER
     // =========================
     {
       name: 'route',
@@ -83,22 +90,22 @@ export default {
         document?.type !== 'private_tour',
     },
     {
-      name: 'timeAPrice',
-      title: 'Time A Price',
+      name: 'dayTimePrice',
+      title: 'Day Rate',
       type: 'string',
-      description: 'Price for Time A (e.g., morning/day rate)',
+      description: 'Day-time price (7:00 AM – 5:00 PM)',
       hidden: ({ document }) => document?.type !== 'private_transfer',
     },
     {
-      name: 'timeBPrice',
-      title: 'Time B Price',
+      name: 'nightTimePrice',
+      title: 'Night Rate',
       type: 'string',
-      description: 'Price for Time B (e.g., evening/night rate)',
+      description: 'Night-time price (5:30 PM – 12:01 AM)',
       hidden: ({ document }) => document?.type !== 'private_transfer',
     },
 
     // =========================
-    // 🏝️ PRIVATE TOUR
+    // PRIVATE TOUR
     // =========================
     {
       name: 'packages',
@@ -129,4 +136,23 @@ export default {
       ],
     },
   ],
+
+  preview: {
+    select: {
+      title: 'title',
+      subtitle: 'type',
+      route: 'route',
+    },
+    prepare({ title, subtitle, route }) {
+      const labels = {
+        self_drive: 'Self Drive',
+        private_transfer: 'Private Transfer',
+        private_tour: 'Private Tour',
+      };
+      return {
+        title: title || route || 'Untitled',
+        subtitle: labels[subtitle] || subtitle,
+      };
+    },
+  },
 }

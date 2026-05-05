@@ -1,5 +1,31 @@
 import { sanityClient } from './sanity.client';
 
+/* ------------------------------------------------------------------ */
+/*  Cache tags                                                         */
+/* ------------------------------------------------------------------ */
+/* Each Sanity document type gets a tag so the on-demand revalidation
+   webhook (app/api/revalidate/route.js) can purge only the data that
+   actually changed. Keep these in sync with the document _type values
+   used in `backend/schemaTypes`. */
+
+export const SANITY_TAGS = {
+  tour: 'tour',
+  transportService: 'transportService',
+  contactInformation: 'contactInformation',
+  galleryImage: 'galleryImage',
+  ourStory: 'ourStory',
+  ourValue: 'ourValue',
+  socialLinks: 'socialLinks',
+  activityPackage: 'activityPackage',
+  testimonial: 'testimonial',
+};
+
+const tagged = (tags) => ({ next: { tags } });
+
+/* ------------------------------------------------------------------ */
+/*  Tours                                                              */
+/* ------------------------------------------------------------------ */
+
 /**
  * All tours for listing page.
  * Fetches enough data for cards + filtering.
@@ -62,34 +88,93 @@ export const allTourSlugsQuery = `
   *[_type == "tour"]{ "slug": slug.current }
 `;
 
-// --------------- transport service queries ---------------
+/* ------------------------------------------------------------------ */
+/*  Transport service (car rental page)                                */
+/* ------------------------------------------------------------------ */
+
+/* Self-drive groups one document per vehicle category, with the
+   individual cars stored in the `vehicles` array. The CMS `category`
+   field uses values like `economy_compact` — the page maps those to
+   the localized labels. */
 
 export const transportServicesByTypeQuery = `{
-  "selfDrive": *[_type == "transportService" && type == "self_drive"] | order(title asc) {
-    _id, title, carModel, dailyPrice, discount3Days
+  "selfDrive": *[_type == "transportService" && type == "self_drive"] | order(category asc) {
+    _id,
+    title,
+    category,
+    vehicles[]{
+      model,
+      dailyPrice,
+      multiDayPrice
+    }
   },
-  "privateTransfer": *[_type == "transportService" && type == "private_transfer"] | order(title asc) {
-    _id, title, route, dayTimePrice, nightTimePrice
+  "privateTransfer": *[_type == "transportService" && type == "private_transfer"] | order(route asc) {
+    _id,
+    title,
+    route,
+    dayTimePrice,
+    nightTimePrice
   },
-  "privateTour": *[_type == "transportService" && type == "private_tour"] | order(title asc) {
-    _id, title, route, packages
+  "privateTour": *[_type == "transportService" && type == "private_tour"] | order(route asc) {
+    _id,
+    title,
+    route,
+    packages
   }
 }`;
 
-// --------------- fetch helpers ---------------
+/* ------------------------------------------------------------------ */
+/*  Testimonials                                                       */
+/* ------------------------------------------------------------------ */
+
+/* We fetch the *whole* collection. The homepage component shuffles
+   client-side so each visitor sees a random 3 — see
+   `components/sections/Testimonials.js`. The order applied here is
+   only the SSG fallback (search-engine view, no-JS visitors): featured
+   first, then by `order`, then by date. */
+export const allTestimonialsQuery = `
+  *[_type == "testimonial"]
+    | order(featured desc, coalesce(order, 9999) asc, date desc, _createdAt desc) {
+      _id,
+      name,
+      location,
+      rating,
+      quote,
+      "avatarUrl": avatar.asset->url,
+      featured,
+      order,
+      date
+    }
+`;
 
 export async function getAllTours() {
-  return sanityClient.fetch(allToursQuery);
+  return sanityClient.fetch(allToursQuery, {}, tagged([SANITY_TAGS.tour]));
 }
 
 export async function getTourBySlug(slug) {
-  return sanityClient.fetch(tourBySlugQuery, { slug });
+  return sanityClient.fetch(
+    tourBySlugQuery,
+    { slug },
+    tagged([SANITY_TAGS.tour, `tour:${slug}`]),
+  );
 }
 
 export async function getAllTourSlugs() {
-  return sanityClient.fetch(allTourSlugsQuery);
+  return sanityClient.fetch(allTourSlugsQuery, {}, tagged([SANITY_TAGS.tour]));
 }
 
 export async function getTransportServices() {
-  return sanityClient.fetch(transportServicesByTypeQuery);
+  return sanityClient.fetch(
+    transportServicesByTypeQuery,
+    {},
+    tagged([SANITY_TAGS.transportService]),
+  );
+}
+
+export async function getAllTestimonials() {
+  return sanityClient.fetch(
+    allTestimonialsQuery,
+    {},
+    tagged([SANITY_TAGS.testimonial]),
+  );
 }

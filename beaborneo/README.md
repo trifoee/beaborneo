@@ -164,7 +164,111 @@ const localizedTitle = getLocalizedValue(content.title, locale);
 | `NEXT_PUBLIC_SANITY_PROJECT_ID` | Sanity project ID | For CMS |
 | `NEXT_PUBLIC_SANITY_DATASET` | Sanity dataset | For CMS |
 | `SANITY_API_TOKEN` | Sanity API token | For CMS |
-| `CONTACT_EMAIL` | Email for contact form | For contact |
+| `SANITY_REVALIDATE_SECRET` | Shared secret for the on-demand revalidation webhook | For instant updates |
+| `RESEND_API_KEY` | API key for the Resend email service | For contact |
+| `CONTACT_EMAIL` | Inbox where contact-form submissions are sent | For contact |
+| `FROM_EMAIL` | Verified "From" address for outgoing emails | For contact |
+
+## On-Demand Revalidation (Sanity → Next.js)
+
+The site uses Next.js cache tags so Sanity content updates show up
+instantly without rebuilding the app. Every Sanity fetch in
+`lib/sanity.queries.js` is tagged by document `_type`, and the route
+at `app/api/revalidate/route.js` listens for Sanity webhook calls and
+purges the matching tag(s).
+
+### One-time setup
+
+1. **Generate a strong secret** locally:
+   ```bash
+   openssl rand -hex 32
+   ```
+2. **Add it to Vercel** (Project → Settings → Environment Variables):
+   `SANITY_REVALIDATE_SECRET = <your-secret>` for *Production*,
+   *Preview*, and *Development*.
+3. **Add the same secret to your local `.env.local`** so you can test
+   the endpoint with `curl` or `ngrok`.
+4. **Create the Sanity webhook** at
+   <https://www.sanity.io/manage/project/nfz6prcr/api/webhooks>
+   → "Create webhook":
+   - **Name:** `Next.js revalidate`
+   - **URL:** `https://<your-production-domain>/api/revalidate`
+   - **Dataset:** `production`
+   - **Trigger on:** Create, Update, Delete
+   - **Filter:**
+     ```
+     _type in [
+       "tour",
+       "transportService",
+       "contactInformation",
+       "galleryImage",
+       "ourStory",
+       "ourValue",
+       "socialLinks",
+       "activityPackage",
+       "testimonial"
+     ]
+     ```
+   - **Projection:**
+     ```
+     { _type, "slug": slug.current }
+     ```
+   - **HTTP method:** `POST`
+   - **API version:** `2024-01-01`
+   - **Secret:** paste the same value as `SANITY_REVALIDATE_SECRET`
+5. **Save** the webhook. Edit any document in Sanity Studio → publish
+   → the live site updates within a few seconds without a rebuild.
+
+### Smoke test
+
+After deploying, hit the endpoint with a `GET` to confirm it's wired:
+
+```bash
+curl https://<your-domain>/api/revalidate
+# → { "ok": true, "message": "Sanity revalidation endpoint. ..." }
+```
+
+A `POST` without a valid signature returns `401`, which is exactly
+what you want.
+
+### How it works
+
+- `lib/sanity.queries.js` tags every fetch — `getAllTours()` uses the
+  `tour` tag, `getTransportServices()` uses `transportService`, etc.
+- `app/api/revalidate/route.js` verifies the Sanity signature with
+  `@sanity/webhook`, then calls `revalidateTag(_type)` plus a
+  `revalidatePath()` for the routes that consume that type as a
+  fallback.
+- The next request after a webhook fires re-runs the GROQ query and
+  re-renders the page. Subsequent requests are served from the new
+  cached version until the next change.
+
+Adding a new document type? Add it to:
+1. `SANITY_TAGS` in `lib/sanity.queries.js`
+2. `TYPE_TO_TAGS` and `TYPE_TO_PATHS` in
+   `app/api/revalidate/route.js`
+3. The webhook filter in Sanity Manage
+
+### Testimonials & SSG randomization
+
+The homepage testimonials live in Sanity (`testimonial` document
+type). The page is statically generated, so picking a random subset
+on the server would freeze the same 3 testimonials between
+revalidations. Instead:
+
+- The full testimonial pool is fetched at build/revalidation time
+  (cache tag: `testimonial`).
+- Search engines and no-JS visitors see the editor-ordered "featured
+  first" subset baked into the static HTML.
+- Real browsers receive the full pool and `components/sections/Testimonials.js`
+  shuffles it after hydration, picking 3 random reviews per visit.
+- When an editor adds or edits a testimonial, the webhook fires and
+  the homepage's static HTML is regenerated with the new pool.
+
+To highlight specific reviews, toggle the `featured` field in Sanity
+Studio — those will appear first in the SSG'd HTML (good for the
+hero few seconds before JS hydrates) while still being part of the
+random rotation.
 
 ## Deployment
 
