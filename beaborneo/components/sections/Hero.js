@@ -250,7 +250,7 @@ export default function Hero({ locale, featuredTours }) {
               >
                 {locale === 'en'
                   ? 'Explore Tour'
-                  : locale === 'ms'
+                  : locale === 'bm'
                     ? 'Terokai Pakej'
                     : 'Jelajahi Paket'}
               </Button>
@@ -261,7 +261,7 @@ export default function Hero({ locale, featuredTours }) {
               >
                 {locale === 'en'
                   ? 'View All Tours'
-                  : locale === 'ms'
+                  : locale === 'bm'
                     ? 'Lihat Semua'
                     : 'Lihat Semua'}
               </Button>

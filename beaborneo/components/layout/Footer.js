@@ -11,8 +11,7 @@ import { t } from '@/lib/i18n';
 const footerContent = {
   description: {
     en: 'Your trusted partner for authentic Borneo adventures. Discover wildlife, culture, and natural wonders with expert local guides.',
-    ms: 'Rakan kongsi dipercayai anda untuk pengembaraan Borneo yang autentik. Temui hidupan liar, budaya, dan keajaiban alam dengan pemandu tempatan pakar.',
-    id: 'Mitra terpercaya Anda untuk petualangan Borneo yang otentik. Temukan satwa liar, budaya, dan keajaiban alam dengan pemandu lokal ahli.',
+    bm: 'Rakan kongsi dipercayai anda untuk pengembaraan Borneo yang autentik. Temui hidupan liar, budaya, dan keajaiban alam dengan pemandu tempatan pakar.',
   },
   socialLinks: [
     { name: 'Facebook', href: 'https://facebook.com/beaborneotravel', icon: 'facebook' },
@@ -26,8 +25,7 @@ const footerContent = {
     mobile: '+60 18 210 3921',
     address: {
       en: 'Lot B13-2A-2, Block B, 1st Floor,\nKepayan Perdana, 88300\nPenampang, Sabah, Malaysia',
-      ms: 'Lot B13-2A-2, Blok B, Tingkat 1,\nKepayan Perdana, 88300\nPenampang, Sabah, Malaysia',
-      id: 'Lot B13-2A-2, Blok B, Lantai 1,\nKepayan Perdana, 88300\nPenampang, Sabah, Malaysia',
+      bm: 'Lot B13-2A-2, Blok B, Tingkat 1,\nKepayan Perdana, 88300\nPenampang, Sabah, Malaysia',
     },
   },
 };
@@ -118,7 +116,7 @@ export default function Footer({ locale }) {
           {/* Popular Tours */}
           <div>
             <h3 className="font-bold text-lg mb-6">
-              {locale === 'en' ? 'Popular Tours' : locale === 'ms' ? 'Pakej Popular' : 'Paket Populer'}
+              {locale === 'en' ? 'Popular Tours' : 'Pakej Popular'}
             </h3>
             <ul className="space-y-3">
               {tourLinks.map((link) => (
@@ -201,7 +199,7 @@ export default function Footer({ locale }) {
         <div className="container mx-auto px-4 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-gray-500 text-sm text-center md:text-left">
-              © {currentYear} Bea Borneo Travel & Tours Sdn. Bhd. {locale === 'en' ? 'All rights reserved.' : locale === 'ms' ? 'Hak cipta terpelihara.' : 'Hak cipta dilindungi.'}
+              © {currentYear} Bea Borneo Travel & Tours Sdn. Bhd. {locale === 'en' ? 'All rights reserved.' : 'Hak cipta terpelihara.'}
             </p>
             <div className="flex items-center gap-6 text-sm text-gray-500">
               <Link href="#" className="hover:text-white transition-colors">

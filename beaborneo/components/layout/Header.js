@@ -81,7 +81,7 @@ export default function Header({ locale }) {
                 href={`/${locale}/contact`}
                 className="px-6 py-2.5 bg-[#E31E24] text-white rounded-full font-semibold text-sm hover:bg-[#c41a1f] transition-all hover:shadow-lg hover:shadow-red-500/25"
               >
-                {locale === 'en' ? 'Book Now' : locale === 'ms' ? 'Tempah' : 'Pesan'}
+                {locale === 'en' ? 'Book Now' : 'Tempah'}
               </Link>
             </div>
           </div>
@@ -137,7 +137,7 @@ export default function Header({ locale }) {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="px-5 py-2 bg-[#E31E24] text-white rounded-full font-semibold text-sm"
               >
-                {locale === 'en' ? 'Book Now' : locale === 'ms' ? 'Tempah' : 'Pesan'}
+                {locale === 'en' ? 'Book Now' : 'Tempah'}
               </Link>
             </div>
           </div>

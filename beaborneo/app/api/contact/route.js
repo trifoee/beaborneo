@@ -131,6 +131,51 @@ function buildEmailText({ name, email, phone, subject, message }) {
 /* ------------------------------------------------------------------ */
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_LEN = {
+  name: 100,
+  email: 254,
+  phone: 50,
+  subject: 50,
+  message: 2000,
+};
+
+/* Best-effort rate limiting (serverless-safe-ish):
+   - Works per warm instance (prevents bursts and basic abuse)
+   - For stronger protection across all instances, we can swap this
+     for Upstash/Redis later. */
+const RATE_LIMITS = {
+  perMinute: 5,
+  perHour: 20,
+};
+const buckets = globalThis.__beaborneoContactBuckets || new Map();
+globalThis.__beaborneoContactBuckets = buckets;
+
+function getClientIp(request) {
+  const xff = request.headers.get('x-forwarded-for');
+  if (xff) return xff.split(',')[0].trim();
+  return request.headers.get('x-real-ip') || 'unknown';
+}
+
+function hitRateLimit(key, now) {
+  const entry = buckets.get(key) || { hits: [] };
+  // keep last 60 minutes
+  entry.hits = entry.hits.filter((t) => now - t < 60 * 60 * 1000);
+  entry.hits.push(now);
+
+  const hitsLastMinute = entry.hits.filter((t) => now - t < 60 * 1000).length;
+  const hitsLastHour = entry.hits.length;
+  buckets.set(key, entry);
+
+  if (hitsLastMinute > RATE_LIMITS.perMinute) return { limited: true, window: 'minute' };
+  if (hitsLastHour > RATE_LIMITS.perHour) return { limited: true, window: 'hour' };
+  return { limited: false };
+}
+
+function countUrls(text) {
+  if (!text) return 0;
+  const matches = String(text).match(/https?:\/\/|www\./gi);
+  return matches ? matches.length : 0;
+}
 
 export async function POST(request) {
   /* 1. Read & validate input */
@@ -145,6 +190,35 @@ export async function POST(request) {
   }
 
   const { name, email, phone, subject, message } = body || {};
+  const { website, startedAt } = body || {};
+
+  // Honeypot: bots often fill every field. Pretend success.
+  if (website) {
+    return NextResponse.json(
+      { success: true, message: 'Thank you for your message. We will get back to you soon!' },
+      { status: 200 },
+    );
+  }
+
+  // Minimum time-on-page check (basic bot deterrent)
+  const now = Date.now();
+  const startedAtNum = Number(startedAt);
+  if (!Number.isFinite(startedAtNum) || now - startedAtNum < 2500) {
+    return NextResponse.json(
+      { error: 'Please wait a moment before submitting the form.' },
+      { status: 429 },
+    );
+  }
+
+  // Best-effort rate limiting
+  const ip = getClientIp(request);
+  const rl = hitRateLimit(`ip:${ip}`, now);
+  if (rl.limited) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please try again later.' },
+      { status: 429 },
+    );
+  }
 
   if (!name || !email || !message) {
     return NextResponse.json(
@@ -156,6 +230,29 @@ export async function POST(request) {
   if (!EMAIL_REGEX.test(email)) {
     return NextResponse.json(
       { error: 'Invalid email format.' },
+      { status: 400 },
+    );
+  }
+
+  // Length limits
+  if (
+    String(name).length > MAX_LEN.name ||
+    String(email).length > MAX_LEN.email ||
+    String(phone || '').length > MAX_LEN.phone ||
+    String(subject || '').length > MAX_LEN.subject ||
+    String(message).length > MAX_LEN.message
+  ) {
+    return NextResponse.json(
+      { error: 'Your message is too long. Please shorten it and try again.' },
+      { status: 413 },
+    );
+  }
+
+  // Spam heuristic: too many links
+  const urlCount = countUrls(message);
+  if (urlCount >= 3) {
+    return NextResponse.json(
+      { error: 'Please remove links from the message and try again.' },
       { status: 400 },
     );
   }

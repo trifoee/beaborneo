@@ -87,11 +87,10 @@ npm run dev
 
 ## Multilingual Routes
 
-The site supports three languages with URL-based routing:
+The site supports two languages with URL-based routing:
 
 - English: `/en`, `/en/about`, `/en/tours`, `/en/contact`
-- Bahasa Melayu: `/ms`, `/ms/about`, `/ms/tours`, `/ms/contact`
-- Bahasa Indonesia: `/id`, `/id/about`, `/id/tours`, `/id/contact`
+- Bahasa Melayu: `/bm`, `/bm/about`, `/bm/tours`, `/bm/contact`
 
 ## Content Management
 
@@ -200,7 +199,7 @@ purges the matching tag(s).
      _type in [
        "tour",
        "transportService",
-       "contactInformation",
+       "contactInfo",
        "galleryImage",
        "ourStory",
        "ourValue",

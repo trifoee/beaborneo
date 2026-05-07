@@ -11,7 +11,7 @@ import { sanityClient } from './sanity.client';
 export const SANITY_TAGS = {
   tour: 'tour',
   transportService: 'transportService',
-  contactInformation: 'contactInformation',
+  contactInfo: 'contactInfo',
   galleryImage: 'galleryImage',
   ourStory: 'ourStory',
   ourValue: 'ourValue',
@@ -86,6 +86,24 @@ export const tourBySlugQuery = `
  */
 export const allTourSlugsQuery = `
   *[_type == "tour"]{ "slug": slug.current }
+`;
+
+/* ------------------------------------------------------------------ */
+/*  Contact info                                                       */
+/* ------------------------------------------------------------------ */
+
+/* Singleton-ish: we fetch the first `contactInfo` document. */
+export const contactInfoQuery = `
+  *[_type == "contactInfo"][0]{
+    _id,
+    email,
+    phone,
+    address,
+    officeHours,
+    whatsappNumber,
+    socialLinks[]{ platform, url, handle },
+    map{ label, addressLine, googleMapsUrl, embedUrl }
+  }
 `;
 
 /* ------------------------------------------------------------------ */
@@ -168,6 +186,14 @@ export async function getTransportServices() {
     transportServicesByTypeQuery,
     {},
     tagged([SANITY_TAGS.transportService]),
+  );
+}
+
+export async function getContactInfo() {
+  return sanityClient.fetch(
+    contactInfoQuery,
+    {},
+    tagged([SANITY_TAGS.contactInfo]),
   );
 }
 

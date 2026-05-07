@@ -257,7 +257,7 @@ export default async function CarRentalPage({ params }) {
         <div className="relative z-10 container mx-auto px-4 lg:px-8 py-32 text-center">
           <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white/90 text-sm font-medium mb-6">
             <span className="w-2 h-2 bg-[#E31E24] rounded-full" />
-            {locale === 'en' ? 'Self-Drive • Transfers • Private Tours' : locale === 'ms' ? 'Pandu Sendiri • Pemindahan • Lawatan Persendirian' : 'Lepas Kunci • Transfer • Tur Privat'}
+            {locale === 'en' ? 'Self-Drive • Transfers • Private Tours' : 'Pandu Sendiri • Pemindahan • Lawatan Persendirian'}
           </span>
           <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6">
             {getLocalizedValue(pageContent.title, locale)}
@@ -291,12 +291,12 @@ export default async function CarRentalPage({ params }) {
                 {locale === 'en' ? '• Self-Drive Rental' : '• Sewa Pandu Sendiri'}
               </span>
               <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-                {locale === 'en' ? 'Car Rental Service' : locale === 'ms' ? 'Perkhidmatan Sewa Kereta' : 'Layanan Sewa Mobil'}
+                {locale === 'en' ? 'Car Rental Service' : 'Perkhidmatan Sewa Kereta'}
               </h2>
               <p className="text-gray-600 text-lg max-w-2xl mx-auto">
                 {locale === 'en'
                   ? 'Choose from our wide range of well-maintained vehicles, with transparent rates and friendly multi-day discounts.'
-                  : locale === 'ms'
+                  : locale === 'bm'
                     ? 'Pilih daripada pelbagai kenderaan kami yang diselenggara dengan baik, dengan kadar telus dan diskaun mesra untuk tempoh sewaan panjang.'
                     : 'Pilih dari berbagai kendaraan terawat kami, dengan tarif transparan dan diskon ramah untuk masa sewa lebih panjang.'}
               </p>
@@ -306,7 +306,7 @@ export default async function CarRentalPage({ params }) {
                 <span className="text-emerald-500">{SparkleIcon}</span>
                 {locale === 'en'
                   ? 'Stay 3 days or more — enjoy a discounted daily rate'
-                  : locale === 'ms'
+                  : locale === 'bm'
                     ? 'Sewa 3 hari atau lebih — nikmati kadar harian terdiskaun'
                     : 'Sewa 3 hari atau lebih — nikmati tarif harian yang lebih murah'}
               </div>
@@ -334,12 +334,12 @@ export default async function CarRentalPage({ params }) {
                       {startingDaily && (
                         <div className="text-right shrink-0">
                           <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
-                            {locale === 'en' ? 'Starting from' : locale === 'ms' ? 'Bermula dari' : 'Mulai dari'}
+                            {locale === 'en' ? 'Starting from' : 'Bermula dari'}
                           </div>
                           <div className="text-base md:text-lg font-bold text-[#E31E24]">
                             {formatRM(startingDaily)}
                             <span className="text-xs font-medium text-gray-500 ml-1">
-                              /{locale === 'en' ? 'day' : locale === 'ms' ? 'hari' : 'hari'}
+                              /{locale === 'en' ? 'day' : 'hari'}
                             </span>
                           </div>
                         </div>
@@ -357,7 +357,7 @@ export default async function CarRentalPage({ params }) {
                             <span className="font-medium text-gray-900">{v?.model}</span>
                             <span className="text-right">
                               <span className="text-xs text-gray-400 mr-1">
-                                {locale === 'en' ? 'from' : locale === 'ms' ? 'dari' : 'dari'}
+                                {locale === 'en' ? 'from' : 'dari'}
                               </span>
                               <span className="font-semibold text-gray-900">
                                 {daily ? formatRM(daily) : v?.dailyPrice || '—'}
@@ -376,7 +376,7 @@ export default async function CarRentalPage({ params }) {
                         <span className="text-emerald-500">{SparkleIcon}</span>
                         {locale === 'en'
                           ? `Save up to ${formatRM(maxSavings)}/day on bookings of 3+ days`
-                          : locale === 'ms'
+                          : locale === 'bm'
                             ? `Jimat sehingga ${formatRM(maxSavings)}/hari untuk tempahan 3+ hari`
                             : `Hemat hingga ${formatRM(maxSavings)}/hari untuk pemesanan 3+ hari`}
                       </div>
@@ -389,7 +389,7 @@ export default async function CarRentalPage({ params }) {
             <p className="text-center text-sm text-gray-400 mt-8">
               {locale === 'en'
                 ? '* Prices are indicative and subject to availability. Terms & conditions apply.'
-                : locale === 'ms'
+                : locale === 'bm'
                   ? '* Harga adalah indikatif dan tertakluk kepada ketersediaan. Terma & syarat terpakai.'
                   : '* Harga bersifat indikatif dan tergantung ketersediaan. Syarat & ketentuan berlaku.'}
             </p>
@@ -407,23 +407,23 @@ export default async function CarRentalPage({ params }) {
                   {locale === 'en' ? '• Private Transfer' : '• Pemindahan Persendirian'}
                 </span>
                 <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-                  {locale === 'en' ? 'Airport & Jetty Transfers' : locale === 'ms' ? 'Pemindahan Lapangan Terbang & Jeti' : 'Transfer Bandara & Dermaga'}
+                  {locale === 'en' ? 'Airport & Jetty Transfers' : 'Pemindahan Lapangan Terbang & Jeti'}
                 </h2>
                 <p className="text-gray-600 text-lg leading-relaxed mb-8">
                   {locale === 'en'
                     ? 'Start or end your Sabah trip stress-free with our reliable point-to-point private transfers. Available day and night with professional, courteous drivers.'
-                    : locale === 'ms'
+                    : locale === 'bm'
                       ? 'Mulakan atau akhiri perjalanan Sabah anda tanpa tekanan dengan pemindahan persendirian kami yang boleh dipercayai. Tersedia siang dan malam dengan pemandu profesional dan berbudi bahasa.'
                       : 'Mulai atau akhiri perjalanan Sabah Anda tanpa stres dengan transfer privat kami yang andal. Tersedia siang dan malam dengan sopir profesional dan ramah.'}
                 </p>
 
                 <div className="flex items-center gap-3 text-sm text-gray-500 mb-2">
                   <span className="w-3 h-3 rounded-full bg-amber-400" />
-                  <span className="font-medium">{locale === 'en' ? 'Day Rate' : locale === 'ms' ? 'Kadar Siang' : 'Tarif Siang'}: 7:00 AM – 5:00 PM</span>
+                  <span className="font-medium">{locale === 'en' ? 'Day Rate' : 'Kadar Siang'}: 7:00 AM – 5:00 PM</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm text-gray-500">
                   <span className="w-3 h-3 rounded-full bg-indigo-500" />
-                  <span className="font-medium">{locale === 'en' ? 'Night Rate' : locale === 'ms' ? 'Kadar Malam' : 'Tarif Malam'}: 5:30 PM – 12:01 AM</span>
+                  <span className="font-medium">{locale === 'en' ? 'Night Rate' : 'Kadar Malam'}: 5:30 PM – 12:01 AM</span>
                 </div>
               </div>
 
@@ -475,12 +475,12 @@ export default async function CarRentalPage({ params }) {
                 {locale === 'en' ? '• Private Tour' : '• Lawatan Persendirian'}
               </span>
               <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-                {locale === 'en' ? 'Private Tour with Driver & Guide' : locale === 'ms' ? 'Lawatan Persendirian dengan Pemandu' : 'Tur Privat dengan Sopir & Pemandu'}
+                {locale === 'en' ? 'Private Tour with Driver & Guide' : 'Lawatan Persendirian dengan Pemandu'}
               </h2>
               <p className="text-white/70 text-lg max-w-2xl mx-auto">
                 {locale === 'en'
                   ? 'Sit back and enjoy the scenery while our experienced driver-guide takes you on a personalised multi-day adventure through Sabah.'
-                  : locale === 'ms'
+                  : locale === 'bm'
                     ? 'Duduk dan nikmati pemandangan sementara pemandu kami yang berpengalaman membawa anda dalam pengembaraan pelbagai hari yang diperibadikan melalui Sabah.'
                     : 'Duduk santai dan nikmati pemandangan sementara sopir-pemandu kami yang berpengalaman membawa Anda dalam petualangan multi-hari yang dipersonalisasi melalui Sabah.'}
               </p>
@@ -536,7 +536,7 @@ export default async function CarRentalPage({ params }) {
             <p className="text-center text-sm text-white/30 mt-8">
               {locale === 'en'
                 ? '* Includes vehicle, fuel, driver-guide, and tolls. Accommodation & meals not included unless specified.'
-                : locale === 'ms'
+                : locale === 'bm'
                   ? '* Termasuk kenderaan, bahan api, pemandu, dan tol. Penginapan & makanan tidak termasuk melainkan dinyatakan.'
                   : '* Termasuk kendaraan, bahan bakar, sopir-pemandu, dan tol. Akomodasi & makanan tidak termasuk kecuali disebutkan.'}
             </p>
@@ -552,7 +552,7 @@ export default async function CarRentalPage({ params }) {
               {locale === 'en' ? '• Why Bea Borneo' : '• Kenapa Bea Borneo'}
             </span>
             <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-              {locale === 'en' ? 'Why Choose Us' : locale === 'ms' ? 'Mengapa Pilih Kami' : 'Mengapa Memilih Kami'}
+              {locale === 'en' ? 'Why Choose Us' : 'Mengapa Pilih Kami'}
             </h2>
           </div>
 
@@ -581,12 +581,12 @@ export default async function CarRentalPage({ params }) {
       <section className="py-20 md:py-32 bg-[#E31E24]">
         <div className="container mx-auto px-4 lg:px-8 text-center">
           <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
-            {locale === 'en' ? 'Ready to Hit the Road?' : locale === 'ms' ? 'Bersedia untuk Memandu?' : 'Siap untuk Berkendara?'}
+            {locale === 'en' ? 'Ready to Hit the Road?' : 'Bersedia untuk Memandu?'}
           </h2>
           <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
             {locale === 'en'
               ? 'Book your vehicle or private tour today. Reach out via our contact form or WhatsApp for the fastest response.'
-              : locale === 'ms'
+              : locale === 'bm'
                 ? 'Tempah kenderaan atau lawatan persendirian anda hari ini. Hubungi kami melalui borang hubungi atau WhatsApp untuk respons terpantas.'
                 : 'Pesan kendaraan atau tur privat Anda hari ini. Hubungi kami melalui formulir kontak atau WhatsApp untuk respons tercepat.'}
           </p>

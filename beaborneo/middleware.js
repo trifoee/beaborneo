@@ -12,6 +12,20 @@ import { locales, defaultLocale } from '@/lib/i18n';
 export function middleware(request) {
   const { pathname } = request.nextUrl;
 
+  // Legacy locale redirects
+  // - /ms → /bm (rename)
+  // - /id → /en (disabled for now)
+  if (pathname === '/ms' || pathname.startsWith('/ms/')) {
+    const newUrl = request.nextUrl.clone();
+    newUrl.pathname = pathname.replace(/^\/ms(?=\/|$)/, '/bm');
+    return NextResponse.redirect(newUrl);
+  }
+  if (pathname === '/id' || pathname.startsWith('/id/')) {
+    const newUrl = request.nextUrl.clone();
+    newUrl.pathname = pathname.replace(/^\/id(?=\/|$)/, '/en');
+    return NextResponse.redirect(newUrl);
+  }
+
   // Check if the pathname starts with a locale
   const pathnameHasLocale = locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`

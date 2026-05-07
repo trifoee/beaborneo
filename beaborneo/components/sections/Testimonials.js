@@ -71,7 +71,7 @@ export default function Testimonials({
         {/* Section Header */}
         <div className="text-center mb-16">
           <span className="inline-block px-4 py-1.5 bg-red-50 text-[#E31E24] rounded-full text-sm font-semibold mb-4">
-            {locale === 'en' ? '• Testimonials' : locale === 'ms' ? '• Testimoni' : '• Testimoni'}
+            {locale === 'en' ? '• Testimonials' : '• Testimoni'}
           </span>
           <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
             {getLocalizedValue(title, locale)}

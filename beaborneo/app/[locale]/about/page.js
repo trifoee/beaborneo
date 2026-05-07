@@ -597,9 +597,7 @@ export default async function AboutPage({ params }) {
                       <div className="text-xs uppercase tracking-wider text-white/60 font-semibold mb-1">
                         {locale === 'en'
                           ? 'Verified Tourism Licence'
-                          : locale === 'ms'
-                            ? 'Lesen Pelancongan Disahkan'
-                            : 'Lisensi Pariwisata Terverifikasi'}
+                          : 'Lesen Pelancongan Disahkan'}
                       </div>
                       <div className="font-heading font-bold text-lg">
                         Government of Malaysia &middot; MOTAC
@@ -627,16 +625,14 @@ export default async function AboutPage({ params }) {
                     <p className="mt-6 text-sm text-gray-600 max-w-xs leading-relaxed">
                       {locale === 'en'
                         ? 'Scan the QR code or click below to verify our licence directly on the official MOTAC tourism registry.'
-                        : locale === 'ms'
-                          ? 'Imbas kod QR atau klik pautan di bawah untuk mengesahkan lesen kami terus di portal rasmi pelancongan MOTAC.'
-                          : 'Pindai kode QR atau klik tautan di bawah untuk memverifikasi lisensi kami langsung di portal pariwisata resmi MOTAC.'}
+                        : 'Imbas kod QR atau klik pautan di bawah untuk mengesahkan lesen kami terus di portal rasmi pelancongan MOTAC.'}
                     </p>
 
                     <div className="mt-6 w-full">
                       <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 mb-4">
                         <div className="text-left">
                           <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
-                            {locale === 'en' ? 'Licence No.' : locale === 'ms' ? 'No. Lesen' : 'No. Lisensi'}
+                            {locale === 'en' ? 'Licence No.' : 'No. Lesen'}
                           </div>
                           <div className="font-mono text-sm font-bold text-gray-900">
                             {MOTAC_LICENSE_NUMBER}
@@ -644,7 +640,7 @@ export default async function AboutPage({ params }) {
                         </div>
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                          {locale === 'en' ? 'Active' : locale === 'ms' ? 'Aktif' : 'Aktif'}
+                          {locale === 'en' ? 'Active' : 'Aktif'}
                         </span>
                       </div>
 
@@ -656,9 +652,7 @@ export default async function AboutPage({ params }) {
                       >
                         {locale === 'en'
                           ? 'Verify on MOTAC Portal'
-                          : locale === 'ms'
-                            ? 'Sahkan di Portal MOTAC'
-                            : 'Verifikasi di Portal MOTAC'}
+                          : 'Sahkan di Portal MOTAC'}
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                         </svg>
@@ -668,9 +662,7 @@ export default async function AboutPage({ params }) {
                         tourlist.gov.my &middot;{' '}
                         {locale === 'en'
                           ? 'Official Ministry of Tourism, Arts and Culture Malaysia portal'
-                          : locale === 'ms'
-                            ? 'Portal rasmi Kementerian Pelancongan, Seni dan Budaya Malaysia'
-                            : 'Portal resmi Kementerian Pariwisata, Seni dan Budaya Malaysia'}
+                          : 'Portal rasmi Kementerian Pelancongan, Seni dan Budaya Malaysia'}
                       </p>
                     </div>
                   </div>

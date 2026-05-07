@@ -107,7 +107,7 @@ export default async function TourPage({ params }) {
                   <h2 className="font-heading text-2xl md:text-3xl font-bold mb-6">
                     {locale === 'en'
                       ? 'Overview'
-                      : locale === 'ms'
+                      : locale === 'bm'
                         ? 'Gambaran Keseluruhan'
                         : 'Gambaran Umum'}
                   </h2>

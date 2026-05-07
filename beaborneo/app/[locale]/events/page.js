@@ -258,7 +258,7 @@ export default async function EventsPage({ params }) {
         <div className="relative z-10 container mx-auto px-4 lg:px-8 py-32 text-center">
           <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white/90 text-sm font-medium mb-6">
             <span className="w-2 h-2 bg-[#E31E24] rounded-full" />
-            {locale === 'en' ? 'Don\'t Miss Out' : locale === 'ms' ? 'Jangan Terlepas' : 'Jangan Lewatkan'}
+            {locale === 'en' ? 'Don\'t Miss Out' : 'Jangan Terlepas'}
           </span>
           <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6">
             {getLocalizedValue(eventsContent.title, locale)}
@@ -277,12 +277,12 @@ export default async function EventsPage({ params }) {
               {locale === 'en' ? '• Special Offers' : '• Tawaran Istimewa'}
             </span>
             <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-              {locale === 'en' ? 'Current Promotions' : locale === 'ms' ? 'Promosi Semasa' : 'Promosi Saat Ini'}
+              {locale === 'en' ? 'Current Promotions' : 'Promosi Semasa'}
             </h2>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto">
               {locale === 'en'
                 ? 'Take advantage of our limited-time deals and make your Sabah trip even more memorable.'
-                : locale === 'ms'
+                : locale === 'bm'
                   ? 'Manfaatkan tawaran masa terhad kami dan jadikan perjalanan Sabah anda lebih berkesan.'
                   : 'Manfaatkan penawaran waktu terbatas kami dan jadikan perjalanan Sabah Anda lebih berkesan.'}
             </p>
@@ -333,7 +333,7 @@ export default async function EventsPage({ params }) {
                   variant={promo.highlight ? 'white' : 'primary'}
                   size="md"
                 >
-                  {locale === 'en' ? 'Claim This Offer' : locale === 'ms' ? 'Tebus Tawaran Ini' : 'Klaim Penawaran Ini'}
+                  {locale === 'en' ? 'Claim This Offer' : 'Tebus Tawaran Ini'}
                 </Button>
               </div>
             ))}
@@ -352,12 +352,12 @@ export default async function EventsPage({ params }) {
               {locale === 'en' ? '• Sabah Events' : '• Acara Sabah'}
             </span>
             <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              {locale === 'en' ? 'Upcoming Events' : locale === 'ms' ? 'Acara Akan Datang' : 'Acara Mendatang'}
+              {locale === 'en' ? 'Upcoming Events' : 'Acara Akan Datang'}
             </h2>
             <p className="text-white/70 text-lg max-w-2xl mx-auto">
               {locale === 'en'
                 ? 'Plan your visit around Sabah\'s vibrant festivals and world-class sporting events.'
-                : locale === 'ms'
+                : locale === 'bm'
                   ? 'Rancang lawatan anda sempena festival meriah dan acara sukan bertaraf dunia Sabah.'
                   : 'Rencanakan kunjungan Anda seputar festival meriah dan acara olahraga kelas dunia Sabah.'}
             </p>
@@ -376,7 +376,7 @@ export default async function EventsPage({ params }) {
                   <span className="text-xs font-bold uppercase tracking-wider text-white/50">
                     {event.type === 'cultural'
                       ? (locale === 'en' ? 'Cultural' : 'Budaya')
-                      : (locale === 'en' ? 'Sports' : locale === 'ms' ? 'Sukan' : 'Olahraga')}
+                      : (locale === 'en' ? 'Sports' : 'Sukan')}
                   </span>
                 </div>
 
@@ -409,7 +409,7 @@ export default async function EventsPage({ params }) {
 
           <div className="text-center mt-12">
             <Button href={`/${locale}/contact`} variant="outline-white" size="lg">
-              {locale === 'en' ? 'Plan Around an Event' : locale === 'ms' ? 'Rancang Sempena Acara' : 'Rencanakan Seputar Acara'}
+              {locale === 'en' ? 'Plan Around an Event' : 'Rancang Sempena Acara'}
             </Button>
           </div>
         </div>
@@ -423,7 +423,7 @@ export default async function EventsPage({ params }) {
               {locale === 'en' ? '• Travel Tips' : '• Tips Perjalanan'}
             </span>
             <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-              {locale === 'en' ? 'Make the Most of Your Trip' : locale === 'ms' ? 'Manfaatkan Sepenuhnya Perjalanan Anda' : 'Maksimalkan Perjalanan Anda'}
+              {locale === 'en' ? 'Make the Most of Your Trip' : 'Manfaatkan Sepenuhnya Perjalanan Anda'}
             </h2>
           </div>
 
@@ -452,21 +452,21 @@ export default async function EventsPage({ params }) {
       <section className="py-20 md:py-32 bg-[#E31E24]">
         <div className="container mx-auto px-4 lg:px-8 text-center">
           <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
-            {locale === 'en' ? 'Ready to Book Your Adventure?' : locale === 'ms' ? 'Bersedia Tempah Pengembaraan Anda?' : 'Siap Memesan Petualangan Anda?'}
+            {locale === 'en' ? 'Ready to Book Your Adventure?' : 'Bersedia Tempah Pengembaraan Anda?'}
           </h2>
           <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
             {locale === 'en'
               ? 'Don\'t miss these exclusive offers. Contact us today and let us craft your perfect Sabah experience.'
-              : locale === 'ms'
+              : locale === 'bm'
                 ? 'Jangan lepaskan tawaran eksklusif ini. Hubungi kami hari ini dan biar kami mencipta pengalaman Sabah sempurna anda.'
                 : 'Jangan lewatkan penawaran eksklusif ini. Hubungi kami hari ini dan biarkan kami merancang pengalaman Sabah sempurna Anda.'}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button href={`/${locale}/contact`} variant="white" size="lg">
-              {locale === 'en' ? 'Contact Us' : locale === 'ms' ? 'Hubungi Kami' : 'Hubungi Kami'}
+              {locale === 'en' ? 'Contact Us' : 'Hubungi Kami'}
             </Button>
             <Button href={`/${locale}/tours`} variant="outline-white" size="lg">
-              {locale === 'en' ? 'Browse Tours' : locale === 'ms' ? 'Lihat Pakej' : 'Lihat Paket'}
+              {locale === 'en' ? 'Browse Tours' : 'Lihat Pakej'}
             </Button>
           </div>
         </div>

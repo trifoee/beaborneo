@@ -48,6 +48,65 @@ export default defineType({
         },
       ],
     }),
+
+    defineField({
+      name: 'whatsappNumber',
+      title: 'WhatsApp Number',
+      description: 'International format preferred, e.g. +60182103921 (no spaces)',
+      type: 'string',
+    }),
+
+    defineField({
+      name: 'socialLinks',
+      title: 'Social Links',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            { name: 'platform', title: 'Platform', type: 'string' },
+            { name: 'url', title: 'URL', type: 'url' },
+            { name: 'handle', title: 'Handle (optional)', type: 'string' },
+          ],
+          preview: {
+            select: { title: 'platform', subtitle: 'url' },
+          },
+        },
+      ],
+    }),
+
+    defineField({
+      name: 'map',
+      title: 'Map',
+      type: 'object',
+      fields: [
+        {
+          name: 'label',
+          title: 'Label',
+          description: 'Short line shown under “Find Us” (e.g. Kepayan Perdana, Penampang)',
+          type: 'string',
+        },
+        {
+          name: 'addressLine',
+          title: 'Address Line',
+          description: 'One-line address for the “Find Us” header area.',
+          type: 'string',
+        },
+        {
+          name: 'googleMapsUrl',
+          title: 'Google Maps URL',
+          description: 'Opens when user clicks “Get Directions”.',
+          type: 'url',
+        },
+        {
+          name: 'embedUrl',
+          title: 'Google Maps Embed URL',
+          description:
+            'The iframe src. Use the full https://www.google.com/maps/embed?... URL.',
+          type: 'url',
+        },
+      ],
+    }),
   ],
 
   preview: {

@@ -6,7 +6,7 @@
  */
 
 // Supported locales
-export const locales = ['en', 'ms', 'id'];
+export const locales = ['en', 'bm'];
 
 // Default locale
 export const defaultLocale = 'en';
@@ -14,15 +14,13 @@ export const defaultLocale = 'en';
 // Locale metadata for SEO and display
 export const localeNames = {
   en: 'English',
-  ms: 'Bahasa Melayu',
-  id: 'Bahasa Indonesia',
+  bm: 'Bahasa Melayu',
 };
 
 // Locale codes for HTML lang attribute
 export const localeHtmlLang = {
   en: 'en',
-  ms: 'ms',
-  id: 'id',
+  bm: 'ms',
 };
 
 /**
@@ -100,7 +98,7 @@ export const translations = {
       error: 'Failed to send message. Please try again.',
     },
   },
-  ms: {
+  bm: {
     navigation: {
       home: 'Utama',
       tours: 'Pakej Pelancongan',
@@ -132,40 +130,6 @@ export const translations = {
       send: 'Hantar Mesej',
       success: 'Mesej berjaya dihantar!',
       error: 'Gagal menghantar mesej. Sila cuba lagi.',
-    },
-  },
-  id: {
-    navigation: {
-      home: 'Beranda',
-      tours: 'Paket Wisata',
-      carRental: 'Sewa Mobil',
-      events: 'Acara & Promo',
-      about: 'Tentang Kami',
-      contact: 'Kontak',
-    },
-    common: {
-      readMore: 'Baca Selengkapnya',
-      viewAll: 'Lihat Semua',
-      bookNow: 'Pesan Sekarang',
-      learnMore: 'Pelajari Lebih',
-      submit: 'Kirim',
-      loading: 'Memuat...',
-      error: 'Terjadi kesalahan',
-    },
-    footer: {
-      copyright: '© 2026 Bea Borneo. Hak cipta dilindungi.',
-      followUs: 'Ikuti Kami',
-      quickLinks: 'Tautan Cepat',
-      contactUs: 'Hubungi Kami',
-    },
-    contact: {
-      title: 'Hubungi Kami',
-      name: 'Nama',
-      email: 'Email',
-      message: 'Pesan',
-      send: 'Kirim Pesan',
-      success: 'Pesan berhasil terkirim!',
-      error: 'Gagal mengirim pesan. Silakan coba lagi.',
     },
   },
 };

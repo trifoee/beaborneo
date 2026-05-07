@@ -15,7 +15,7 @@
  *        Dataset:  production
  *        Trigger:  Create, Update, Delete
  *        Filter:   _type in [
- *                    "tour", "transportService", "contactInformation",
+ *                    "tour", "transportService", "contactInfo",
  *                    "galleryImage", "ourStory", "ourValue",
  *                    "socialLinks", "activityPackage", "testimonial"
  *                  ]
@@ -36,7 +36,7 @@ import { isValidSignature, SIGNATURE_HEADER_NAME } from '@sanity/webhook';
 const TYPE_TO_TAGS = {
   tour: ['tour'],
   transportService: ['transportService'],
-  contactInformation: ['contactInformation'],
+  contactInfo: ['contactInfo'],
   galleryImage: ['galleryImage'],
   ourStory: ['ourStory'],
   ourValue: ['ourValue'],
@@ -51,7 +51,7 @@ const TYPE_TO_TAGS = {
 const TYPE_TO_PATHS = {
   tour: ['/[locale]', '/[locale]/tours', '/[locale]/tours/[slug]'],
   transportService: ['/[locale]/car-rental'],
-  contactInformation: ['/[locale]/contact'],
+  contactInfo: ['/[locale]/contact'],
   galleryImage: ['/[locale]'],
   ourStory: ['/[locale]/about'],
   ourValue: ['/[locale]/about'],
