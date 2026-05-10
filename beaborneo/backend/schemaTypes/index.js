@@ -6,5 +6,16 @@ import our_value from './aboutUs/our_value'
 import transport_service from './transport_service/transport_service'
 import social_links from './social_links/social_links'
 import activity_package from './tours/activity_package'
+import testimonial from './testimonial/testimonial'
 
-export const schemaTypes = [ tour , activity_package , contact_information , galleryImage , our_story , our_value, transport_service ,social_links ]
+export const schemaTypes = [
+  tour,
+  activity_package,
+  contact_information,
+  galleryImage,
+  our_story,
+  our_value,
+  transport_service,
+  social_links,
+  testimonial,
+]

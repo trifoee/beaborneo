@@ -38,15 +38,15 @@ export default function FeaturedTours({ locale, tours }) {
         {/* Section Header */}
         <div className="text-center mb-12">
           <span className="inline-block px-4 py-1.5 bg-red-50 text-[#E31E24] rounded-full text-sm font-semibold mb-4">
-            {locale === 'en' ? '• Tour Packages' : locale === 'ms' ? '• Pakej Pelancongan' : '• Paket Wisata'}
+            {locale === 'en' ? '• Tour Packages' : '• Pakej Pelancongan'}
           </span>
           <h2 className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-            {locale === 'en' ? 'Our Tour Package Ensures A ' : locale === 'ms' ? 'Pakej Pelancongan Kami Menjamin ' : 'Paket Wisata Kami Menjamin '}
+            {locale === 'en' ? 'Our Tour Package Ensures A ' : 'Pakej Pelancongan Kami Menjamin '}
             <span className="text-[#E31E24]">
               {locale === 'en' ? 'Seamless' : 'Pengalaman'}
             </span>
             <br />
-            {locale === 'en' ? 'And Memorable Adventure.' : locale === 'ms' ? 'Yang Lancar Dan Tidak Dapat Dilupakan.' : 'Yang Lancar Dan Tak Terlupakan.'}
+            {locale === 'en' ? 'And Memorable Adventure.' : 'Yang Lancar Dan Tidak Dapat Dilupakan.'}
           </h2>
         </div>
 
@@ -166,7 +166,7 @@ export default function FeaturedTours({ locale, tours }) {
             href={`/${locale}/tours`}
             className="inline-flex items-center gap-2 px-8 py-4 border-2 border-gray-900 text-gray-900 rounded-full font-semibold hover:bg-gray-900 hover:text-white transition-all group"
           >
-            {locale === 'en' ? 'View All Tour Packages' : locale === 'ms' ? 'Lihat Semua Pakej' : 'Lihat Semua Paket'}
+            {locale === 'en' ? 'View All Tour Packages' : 'Lihat Semua Pakej'}
             <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>

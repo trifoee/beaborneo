@@ -12,12 +12,15 @@ import { isValidEmail } from '@/lib/utils';
 import Button from '@/components/ui/Button';
 
 export default function ContactForm({ locale }) {
+  const [startedAt] = useState(() => Date.now());
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
     subject: '',
     message: '',
+    // Bot trap — hidden field that humans should never fill.
+    website: '',
   });
   const [status, setStatus] = useState({ type: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,9 +39,7 @@ export default function ContactForm({ locale }) {
         type: 'error',
         message: locale === 'en' 
           ? 'Please fill in all required fields.' 
-          : locale === 'ms'
-          ? 'Sila isi semua medan yang diperlukan.'
-          : 'Harap isi semua kolom yang diperlukan.',
+          : 'Sila isi semua medan yang diperlukan.',
       });
       return;
     }
@@ -48,9 +49,7 @@ export default function ContactForm({ locale }) {
         type: 'error',
         message: locale === 'en'
           ? 'Please enter a valid email address.'
-          : locale === 'ms'
-          ? 'Sila masukkan alamat emel yang sah.'
-          : 'Harap masukkan alamat email yang valid.',
+          : 'Sila masukkan alamat emel yang sah.',
       });
       return;
     }
@@ -62,7 +61,7 @@ export default function ContactForm({ locale }) {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, startedAt }),
       });
 
       const data = await response.json();
@@ -75,7 +74,7 @@ export default function ContactForm({ locale }) {
         type: 'success',
         message: t(locale, 'contact.success'),
       });
-      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+      setFormData({ name: '', email: '', phone: '', subject: '', message: '', website: '' });
     } catch (error) {
       setStatus({
         type: 'error',
@@ -91,6 +90,21 @@ export default function ContactForm({ locale }) {
 
   return (
     <form onSubmit={handleSubmit} className="contact-form space-y-6">
+      {/* Honeypot field (hidden). If a bot fills this, the server will
+          silently drop the submission. */}
+      <div className="hidden" aria-hidden="true">
+        <label htmlFor="website">Website</label>
+        <input
+          type="text"
+          id="website"
+          name="website"
+          value={formData.website}
+          onChange={handleChange}
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+
       {/* Name */}
       <div>
         <label htmlFor="name" className={labelClasses}>
@@ -126,7 +140,7 @@ export default function ContactForm({ locale }) {
       {/* Phone (Optional) */}
       <div>
         <label htmlFor="phone" className={labelClasses}>
-          {locale === 'en' ? 'Phone Number' : locale === 'ms' ? 'Nombor Telefon' : 'Nomor Telepon'}
+          {locale === 'en' ? 'Phone Number' : 'Nombor Telefon'}
         </label>
         <input
           type="tel"
@@ -141,7 +155,7 @@ export default function ContactForm({ locale }) {
       {/* Subject (Optional) */}
       <div>
         <label htmlFor="subject" className={labelClasses}>
-          {locale === 'en' ? 'Subject' : locale === 'ms' ? 'Subjek' : 'Subjek'}
+          {locale === 'en' ? 'Subject' : 'Subjek'}
         </label>
         <select
           id="subject"
@@ -151,19 +165,19 @@ export default function ContactForm({ locale }) {
           className={inputClasses}
         >
           <option value="">
-            {locale === 'en' ? 'Select a subject' : locale === 'ms' ? 'Pilih subjek' : 'Pilih subjek'}
+            {locale === 'en' ? 'Select a subject' : 'Pilih subjek'}
           </option>
           <option value="general">
-            {locale === 'en' ? 'General Inquiry' : locale === 'ms' ? 'Pertanyaan Umum' : 'Pertanyaan Umum'}
+            {locale === 'en' ? 'General Inquiry' : 'Pertanyaan Umum'}
           </option>
           <option value="booking">
-            {locale === 'en' ? 'Tour Booking' : locale === 'ms' ? 'Tempahan Pakej' : 'Pemesanan Paket'}
+            {locale === 'en' ? 'Tour Booking' : 'Tempahan Pakej'}
           </option>
           <option value="custom">
-            {locale === 'en' ? 'Custom Tour Request' : locale === 'ms' ? 'Permintaan Pakej Khas' : 'Permintaan Paket Khusus'}
+            {locale === 'en' ? 'Custom Tour Request' : 'Permintaan Pakej Khas'}
           </option>
           <option value="feedback">
-            {locale === 'en' ? 'Feedback' : locale === 'ms' ? 'Maklum Balas' : 'Umpan Balik'}
+            {locale === 'en' ? 'Feedback' : 'Maklum Balas'}
           </option>
         </select>
       </div>

@@ -8,6 +8,7 @@
 import { generateMetadata as generateSeoMetadata } from '@/lib/seo';
 import { getLocalizedValue } from '@/lib/i18n';
 import ContactForm from '@/components/sections/ContactForm';
+import { getContactInfo } from '@/lib/sanity.queries';
 
 const contactContent = {
   title: {
@@ -74,6 +75,54 @@ export async function generateMetadata({ params }) {
 export default async function ContactPage({ params }) {
   const { locale } = await params;
 
+  let contactInfo;
+  try {
+    contactInfo = await getContactInfo();
+  } catch (err) {
+    console.error('Failed to fetch contact info from Sanity:', err);
+  }
+
+  const email = contactInfo?.email || contactContent.info.email.value;
+  const phonePrimary = contactInfo?.phone || contactContent.info.phone.value;
+  const address = contactInfo?.address || getLocalizedValue(contactContent.info.address.value, locale);
+  const officeHours = contactInfo?.officeHours
+    ? [
+        contactInfo.officeHours.mondayToFriday && `Monday - Friday: ${contactInfo.officeHours.mondayToFriday}`,
+        contactInfo.officeHours.saturday && `Saturday: ${contactInfo.officeHours.saturday}`,
+        contactInfo.officeHours.sunday && `Sunday: ${contactInfo.officeHours.sunday}`,
+      ]
+        .filter(Boolean)
+        .join('\n')
+    : getLocalizedValue(contactContent.info.hours.value, locale);
+
+  const whatsappNumberRaw =
+    contactInfo?.whatsappNumber ||
+    (contactContent.info.phone.mobile || '').replace(/[^\d+]/g, '') ||
+    '+60182103921';
+  const whatsappLink = `https://wa.me/${whatsappNumberRaw.replace(/[^\d]/g, '')}`;
+
+  const socialLinks =
+    Array.isArray(contactInfo?.socialLinks) && contactInfo.socialLinks.length > 0
+      ? contactInfo.socialLinks
+      : [
+          { platform: 'Facebook', url: 'https://facebook.com/beaborneotravel' },
+          { platform: 'Instagram', url: 'https://instagram.com/beaborneotravel' },
+          { platform: 'TikTok', url: 'https://tiktok.com/@beaborneotravel' },
+        ];
+
+  const socialHandle =
+    socialLinks.find((s) => s?.handle)?.handle || contactContent.info.social.handle;
+
+  const mapLabel = contactInfo?.map?.label || (locale === 'en' ? 'Find Us' : 'Cari Kami');
+  const mapAddressLine =
+    contactInfo?.map?.addressLine || 'Kepayan Perdana, 88300 Penampang, Sabah, Malaysia';
+  const googleMapsUrl =
+    contactInfo?.map?.googleMapsUrl ||
+    'https://www.google.com/maps/search/Kepayan+Perdana+88300+Penampang+Sabah+Malaysia';
+  const embedUrl =
+    contactInfo?.map?.embedUrl ||
+    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.9!2d116.0533!3d5.9714!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x323b69e0aa1234%3A0x0!2sKepayan+Perdana%2C+88300+Penampang%2C+Sabah!5e0!3m2!1sen!2smy!4v1';
+
   return (
     <div className="contact-page">
       {/* Hero Section */}
@@ -135,10 +184,10 @@ export default async function ContactPage({ params }) {
                           {getLocalizedValue(contactContent.info.email.label, locale)}
                         </div>
                         <a 
-                          href={`mailto:${contactContent.info.email.value}`}
+                          href={`mailto:${email}`}
                           className="text-gray-900 font-semibold hover:text-[#E31E24] transition-colors"
                         >
-                          {contactContent.info.email.value}
+                          {email}
                         </a>
                       </div>
                     </div>
@@ -155,16 +204,10 @@ export default async function ContactPage({ params }) {
                           {getLocalizedValue(contactContent.info.phone.label, locale)}
                         </div>
                         <a 
-                          href={`tel:${contactContent.info.phone.value}`}
+                          href={`tel:${phonePrimary}`}
                           className="text-gray-900 font-semibold hover:text-[#E31E24] transition-colors block"
                         >
-                          {contactContent.info.phone.value}
-                        </a>
-                        <a 
-                          href={`tel:${contactContent.info.phone.mobile}`}
-                          className="text-gray-900 font-semibold hover:text-[#E31E24] transition-colors block"
-                        >
-                          {contactContent.info.phone.mobile}
+                          {phonePrimary}
                         </a>
                       </div>
                     </div>
@@ -182,7 +225,7 @@ export default async function ContactPage({ params }) {
                           {getLocalizedValue(contactContent.info.address.label, locale)}
                         </div>
                         <p className="text-gray-900 font-semibold whitespace-pre-line">
-                          {getLocalizedValue(contactContent.info.address.value, locale)}
+                          {address}
                         </p>
                       </div>
                     </div>
@@ -199,40 +242,21 @@ export default async function ContactPage({ params }) {
                           {getLocalizedValue(contactContent.info.social.label, locale)}
                         </div>
                         <div className="flex items-center gap-3">
-                          <a 
-                            href="https://facebook.com/beaborneotravel"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-gray-900 font-semibold hover:text-[#E31E24] transition-colors"
-                            aria-label="Facebook"
-                          >
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M18.77 7.46H14.5v-1.9c0-.9.6-1.1 1-1.1h3V.5h-4.33C10.24.5 9.5 3.44 9.5 5.32v2.15h-3v4h3v12h5v-12h3.85l.42-4z" />
-                            </svg>
-                          </a>
-                          <a 
-                            href="https://instagram.com/beaborneotravel"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-gray-900 font-semibold hover:text-[#E31E24] transition-colors"
-                            aria-label="Instagram"
-                          >
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-                            </svg>
-                          </a>
-                          <a 
-                            href="https://tiktok.com/@beaborneotravel"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-gray-900 font-semibold hover:text-[#E31E24] transition-colors"
-                            aria-label="TikTok"
-                          >
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                              <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 0010.86 4.46 6.28 6.28 0 001.88-4.49V8.76a8.26 8.26 0 004.84 1.56v-3.5a4.84 4.84 0 01-1.14-.13z" />
-                            </svg>
-                          </a>
-                          <span className="text-gray-600 text-sm ml-1">{contactContent.info.social.handle}</span>
+                          {socialLinks.map((s, idx) => (
+                            <a
+                              key={`${s.platform || 'social'}-${idx}`}
+                              href={s.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-gray-900 font-semibold hover:text-[#E31E24] transition-colors text-sm"
+                              aria-label={s.platform || 'Social'}
+                            >
+                              {s.platform || 'Social'}
+                            </a>
+                          ))}
+                          {socialHandle && (
+                            <span className="text-gray-600 text-sm ml-1">{socialHandle}</span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -249,7 +273,7 @@ export default async function ContactPage({ params }) {
                           {getLocalizedValue(contactContent.info.hours.label, locale)}
                         </div>
                         <p className="text-gray-900 font-semibold whitespace-pre-line">
-                          {getLocalizedValue(contactContent.info.hours.value, locale)}
+                          {officeHours}
                         </p>
                       </div>
                     </div>
@@ -270,7 +294,7 @@ export default async function ContactPage({ params }) {
                       : 'Berbual dengan kami secara langsung!'}
                   </p>
                   <a 
-                    href="https://wa.me/60182103921"
+                    href={whatsappLink}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#25D366] rounded-full font-semibold hover:bg-gray-100 transition-colors"
@@ -300,14 +324,14 @@ export default async function ContactPage({ params }) {
               </div>
               <div>
                 <h3 className="font-heading font-bold text-gray-900">
-                  {locale === 'en' ? 'Find Us' : 'Cari Kami'}
+                  {mapLabel}
                 </h3>
                 <p className="text-sm text-gray-500">
-                  Kepayan Perdana, 88300 Penampang, Sabah, Malaysia
+                  {mapAddressLine}
                 </p>
               </div>
               <a
-                href="https://www.google.com/maps/search/Kepayan+Perdana+88300+Penampang+Sabah+Malaysia"
+                href={googleMapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="ml-auto hidden sm:inline-flex items-center gap-2 px-5 py-2.5 bg-[#E31E24] text-white text-sm font-semibold rounded-full hover:bg-[#c41a1f] transition-colors"
@@ -319,7 +343,7 @@ export default async function ContactPage({ params }) {
               </a>
             </div>
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.9!2d116.0533!3d5.9714!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x323b69e0aa1234%3A0x0!2sKepayan+Perdana%2C+88300+Penampang%2C+Sabah!5e0!3m2!1sen!2smy!4v1"
+              src={embedUrl}
               width="100%"
               height="450"
               style={{ border: 0 }}

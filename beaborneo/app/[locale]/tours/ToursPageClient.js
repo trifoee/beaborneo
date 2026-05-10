@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { getLocalizedField, getStartingPrice } from '@/lib/sanity.utils';
@@ -19,16 +19,76 @@ const categories = [
 
 export default function ToursPageClient({ locale, tours }) {
   const [activeCategory, setActiveCategory] = useState('all');
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState('featured');
 
-  const filteredTours =
-    activeCategory === 'all'
-      ? tours
-      : tours.filter((tour) => tour.tourType?.includes(activeCategory));
+  const normalizedQuery = query.trim().toLowerCase();
 
-  const activeCategoryIds = new Set(tours.flatMap((t) => t.tourType || []));
-  const visibleCategories = categories.filter(
-    (c) => c.id === 'all' || activeCategoryIds.has(c.id),
-  );
+  const parsePrice = (value) => {
+    if (!value || typeof value !== 'string') return null;
+    const num = Number(value.replace(/[^\d.]/g, ''));
+    return Number.isFinite(num) && num > 0 ? num : null;
+  };
+
+  const parseDurationDays = (value) => {
+    if (!value) return null;
+    // crude parse: grabs first integer
+    const m = String(value).match(/(\d+)/);
+    return m ? Number(m[1]) : null;
+  };
+
+  const visibleCategories = useMemo(() => {
+    const activeCategoryIds = new Set(tours.flatMap((t) => t.tourType || []));
+    return categories.filter((c) => c.id === 'all' || activeCategoryIds.has(c.id));
+  }, [tours]);
+
+  const filteredTours = useMemo(() => {
+    const base =
+      activeCategory === 'all'
+        ? tours
+        : tours.filter((tour) => tour.tourType?.includes(activeCategory));
+
+    const searched = !normalizedQuery
+      ? base
+      : base.filter((tour) => {
+          const haystack = [
+            tour.title,
+            tour.location,
+            tour.duration,
+            getLocalizedField(tour.tagline, locale),
+          ]
+            .filter(Boolean)
+            .join(' ')
+            .toLowerCase();
+          return haystack.includes(normalizedQuery);
+        });
+
+    const sorted = [...searched];
+    sorted.sort((a, b) => {
+      if (sort === 'newest') {
+        return (b._createdAt || '').localeCompare(a._createdAt || '');
+      }
+      if (sort === 'price_low') {
+        const pa = parsePrice(getStartingPrice(a)) ?? Number.POSITIVE_INFINITY;
+        const pb = parsePrice(getStartingPrice(b)) ?? Number.POSITIVE_INFINITY;
+        return pa - pb;
+      }
+      if (sort === 'price_high') {
+        const pa = parsePrice(getStartingPrice(a)) ?? Number.NEGATIVE_INFINITY;
+        const pb = parsePrice(getStartingPrice(b)) ?? Number.NEGATIVE_INFINITY;
+        return pb - pa;
+      }
+      if (sort === 'duration_short') {
+        const da = parseDurationDays(a.duration) ?? Number.POSITIVE_INFINITY;
+        const db = parseDurationDays(b.duration) ?? Number.POSITIVE_INFINITY;
+        return da - db;
+      }
+      // default: featured first, then title
+      if (a.featured !== b.featured) return a.featured ? -1 : 1;
+      return (a.title || '').localeCompare(b.title || '');
+    });
+    return sorted;
+  }, [activeCategory, tours, normalizedQuery, locale, sort]);
 
   return (
     <div className="tours-page">
@@ -58,6 +118,67 @@ export default function ToursPageClient({ locale, tours }) {
       {/* Tours Content */}
       <section className="py-20 md:py-32">
         <div className="container mx-auto px-4 lg:px-8">
+          {/* Search + Sort */}
+          <div className="max-w-4xl mx-auto mb-10">
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-4 md:p-5">
+              <div className="grid md:grid-cols-[1fr_220px] gap-3 items-center">
+                <div className="relative">
+                  <svg
+                    className="w-5 h-5 text-gray-400 absolute left-4 top-1/2 -translate-y-1/2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-4.35-4.35m0 0A7.5 7.5 0 1 0 6.15 6.15a7.5 7.5 0 0 0 10.5 10.5Z" />
+                  </svg>
+                  <input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder={locale === 'en' ? 'Search tours (e.g. “Semporna”, “diving”, “Kundasang”)…' : 'Cari pakej (cth. “Semporna”, “diving”, “Kundasang”)…'}
+                    className="w-full pl-12 pr-4 py-3 rounded-2xl bg-stone-50 border border-gray-100 focus:outline-none focus:ring-2 focus:ring-[#E31E24]/30 focus:border-[#E31E24]/30"
+                  />
+                </div>
+                <div className="flex items-center gap-3">
+                  <label className="text-sm font-semibold text-gray-700 hidden md:block">
+                    {locale === 'en' ? 'Sort' : 'Susun'}
+                  </label>
+                  <select
+                    value={sort}
+                    onChange={(e) => setSort(e.target.value)}
+                    className="w-full py-3 px-4 rounded-2xl bg-stone-50 border border-gray-100 focus:outline-none focus:ring-2 focus:ring-[#E31E24]/30 focus:border-[#E31E24]/30 text-sm font-semibold text-gray-800"
+                  >
+                    <option value="featured">{locale === 'en' ? 'Featured' : 'Pilihan'}</option>
+                    <option value="newest">{locale === 'en' ? 'Newest' : 'Terbaharu'}</option>
+                    <option value="price_low">{locale === 'en' ? 'Price (Low → High)' : 'Harga (Rendah → Tinggi)'}</option>
+                    <option value="price_high">{locale === 'en' ? 'Price (High → Low)' : 'Harga (Tinggi → Rendah)'}</option>
+                    <option value="duration_short">{locale === 'en' ? 'Duration (Shortest)' : 'Tempoh (Terpendek)'}</option>
+                  </select>
+                </div>
+              </div>
+              {(normalizedQuery || activeCategory !== 'all') && (
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-3 px-2">
+                  <div className="text-xs text-gray-500">
+                    {locale === 'en'
+                      ? `${filteredTours.length} tours found`
+                      : `${filteredTours.length} pakej ditemui`}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQuery('');
+                      setActiveCategory('all');
+                      setSort('featured');
+                    }}
+                    className="text-xs font-semibold text-[#E31E24] hover:text-[#c41a1f]"
+                  >
+                    {locale === 'en' ? 'Clear filters' : 'Padam penapis'}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Filter Tabs — only show categories that have at least one tour */}
           {visibleCategories.length > 2 && (
             <div className="flex flex-wrap justify-center gap-3 mb-12">
@@ -130,7 +251,7 @@ export default function ToursPageClient({ locale, tours }) {
                         {getLocalizedField(tour.tagline, locale)}
                       </p>
 
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between gap-3">
                         {startingPrice && (
                           <div>
                             <span className="text-white/60 text-sm">

@@ -26,11 +26,8 @@ export default function NotFound() {
           <Button href="/en" variant="primary">
             Go to Homepage (EN)
           </Button>
-          <Button href="/ms" variant="outline">
-            Pergi ke Halaman Utama (MS)
-          </Button>
-          <Button href="/id" variant="outline">
-            Pergi ke Beranda (ID)
+          <Button href="/bm" variant="outline">
+            Pergi ke Halaman Utama (BM)
           </Button>
         </div>
       </div>

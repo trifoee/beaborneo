@@ -9,6 +9,14 @@ import { generateMetadata as generateSeoMetadata } from '@/lib/seo';
 import { getLocalizedValue } from '@/lib/i18n';
 import ImageBlock from '@/components/ui/ImageBlock';
 import Button from '@/components/ui/Button';
+import QRCode from '@/components/ui/QRCode';
+
+/* MOTAC tourism-licence verification page. Editing this URL is the
+   only thing needed when the licence is renewed — the QR code is
+   regenerated on the next deploy/revalidation. */
+const MOTAC_VERIFICATION_URL =
+  'https://www.tourlist.gov.my/Public/Semakan?refno=12/01/02/25/00292&licno=MOTAC%20L/N/11786';
+const MOTAC_LICENSE_NUMBER = 'MOTAC L/N 11786';
 
 const aboutContent = {
   title: {
@@ -331,21 +339,21 @@ export default async function AboutPage({ params }) {
             <div className="relative">
               <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
                 <ImageBlock
-                  src="/images/about/team.png"
+                  src="/images/about/team_ai.png"
                   alt="Bea Borneo Travel Team"
                   fill
                   className="object-cover object-top"
                   priority
                 />
               </div>
-              <div className="absolute -bottom-8 -right-4 md:-right-8 w-48 md:w-64 aspect-[4/3] rounded-2xl overflow-hidden shadow-xl border-4 border-white">
+              {/* <div className="absolute -bottom-8 -right-4 md:-right-8 w-48 md:w-64 aspect-[4/3] rounded-2xl overflow-hidden shadow-xl border-4 border-white">
                 <ImageBlock
-                  src="/images/about/teamwork.jpeg"
+                  src="/images/about/logo.png"
                   alt="Teamwork and collaboration"
                   fill
                   className="object-cover"
                 />
-              </div>
+              </div> */}
             </div>
 
             <div>
@@ -578,18 +586,86 @@ export default async function AboutPage({ params }) {
             </div>
 
             <div className="relative">
-              <div className="aspect-[4/5] rounded-3xl overflow-hidden shadow-xl">
-                <ImageBlock
-                  src="/images/about/partnership.jpeg"
-                  alt="Professional partnership and trust"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="absolute -bottom-6 -left-6 bg-[#E31E24] text-white p-6 rounded-2xl shadow-xl">
-                <div className="text-2xl font-bold">MOTAC</div>
-                <div className="text-sm opacity-90">
-                  {locale === 'en' ? 'Licensed Agency' : 'Agensi Berlesen'}
+              {/* MOTAC verification card — links to the official tourism
+                  registry so visitors can confirm the licence is real
+                  without having to trust a static image we host. */}
+              <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+                {/* Header */}
+                <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-8 py-6 text-white">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-xs uppercase tracking-wider text-white/60 font-semibold mb-1">
+                        {locale === 'en'
+                          ? 'Verified Tourism Licence'
+                          : 'Lesen Pelancongan Disahkan'}
+                      </div>
+                      <div className="font-heading font-bold text-lg">
+                        Government of Malaysia &middot; MOTAC
+                      </div>
+                    </div>
+                    <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Body */}
+                <div className="px-8 py-10">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="rounded-2xl bg-white p-4 ring-1 ring-gray-100 shadow-sm">
+                      <QRCode
+                        value={MOTAC_VERIFICATION_URL}
+                        size={200}
+                        alt={`Scan to verify ${MOTAC_LICENSE_NUMBER}`}
+                      />
+                    </div>
+
+                    <p className="mt-6 text-sm text-gray-600 max-w-xs leading-relaxed">
+                      {locale === 'en'
+                        ? 'Scan the QR code or click below to verify our licence directly on the official MOTAC tourism registry.'
+                        : 'Imbas kod QR atau klik pautan di bawah untuk mengesahkan lesen kami terus di portal rasmi pelancongan MOTAC.'}
+                    </p>
+
+                    <div className="mt-6 w-full">
+                      <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 mb-4">
+                        <div className="text-left">
+                          <div className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
+                            {locale === 'en' ? 'Licence No.' : 'No. Lesen'}
+                          </div>
+                          <div className="font-mono text-sm font-bold text-gray-900">
+                            {MOTAC_LICENSE_NUMBER}
+                          </div>
+                        </div>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                          {locale === 'en' ? 'Active' : 'Aktif'}
+                        </span>
+                      </div>
+
+                      <a
+                        href={MOTAC_VERIFICATION_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-2 w-full px-5 py-3 rounded-xl bg-[#E31E24] text-white font-semibold text-sm hover:bg-[#c4181d] transition-colors"
+                      >
+                        {locale === 'en'
+                          ? 'Verify on MOTAC Portal'
+                          : 'Sahkan di Portal MOTAC'}
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                        </svg>
+                      </a>
+
+                      <p className="mt-3 text-[11px] text-gray-400 leading-relaxed">
+                        tourlist.gov.my &middot;{' '}
+                        {locale === 'en'
+                          ? 'Official Ministry of Tourism, Arts and Culture Malaysia portal'
+                          : 'Portal rasmi Kementerian Pelancongan, Seni dan Budaya Malaysia'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

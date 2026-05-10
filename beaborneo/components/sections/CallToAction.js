@@ -67,7 +67,7 @@ export default function CallToAction({ locale }) {
               size="lg"
               className="!bg-white !text-[#E31E24] hover:!bg-gray-100 shadow-xl"
             >
-              {locale === 'en' ? 'Plan Your Trip' : locale === 'ms' ? 'Rancang Perjalanan' : 'Rencanakan Perjalanan'}
+              {locale === 'en' ? 'Plan Your Trip' : 'Rancang Perjalanan'}
             </Button>
             <Button
               href={`/${locale}/tours`}
@@ -75,7 +75,7 @@ export default function CallToAction({ locale }) {
               size="lg"
               className="!border-white !text-white hover:!bg-white/10"
             >
-              {locale === 'en' ? 'Browse Tours' : locale === 'ms' ? 'Lihat Pakej' : 'Lihat Paket'}
+              {locale === 'en' ? 'Browse Tours' : 'Lihat Pakej'}
             </Button>
           </div>
 

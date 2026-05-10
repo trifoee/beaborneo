@@ -10,6 +10,9 @@ import './globals.css';
 export const metadata = {
   title: 'Bea Borneo Travel',
   description: 'Discover the beauty of Borneo with our curated travel experiences.',
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({ children }) {

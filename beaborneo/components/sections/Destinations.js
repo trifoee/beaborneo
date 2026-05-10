@@ -72,7 +72,7 @@ export default function Destinations({ locale, tours }) {
           >
             {locale === 'en'
               ? 'View All Destinations'
-              : locale === 'ms'
+              : locale === 'bm'
                 ? 'Lihat Semua Destinasi'
                 : 'Lihat Semua Destinasi'}
             <svg
@@ -133,7 +133,7 @@ export default function Destinations({ locale, tours }) {
                     {destination.tours}{' '}
                     {locale === 'en'
                       ? 'Tours Available'
-                      : locale === 'ms'
+                      : locale === 'bm'
                         ? 'Pakej Tersedia'
                         : 'Paket Tersedia'}
                   </p>
