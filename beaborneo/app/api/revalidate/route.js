@@ -51,7 +51,7 @@ const TYPE_TO_TAGS = {
 const TYPE_TO_PATHS = {
   tour: ['/[locale]', '/[locale]/tours', '/[locale]/tours/[slug]'],
   transportService: ['/[locale]/car-rental'],
-  contactInfo: ['/[locale]/contact'],
+  contactInfo: ['/[locale]', '/[locale]/contact', '/[locale]/tours', '/[locale]/about', '/[locale]/car-rental'],
   galleryImage: ['/[locale]'],
   ourStory: ['/[locale]/about'],
   ourValue: ['/[locale]/about'],

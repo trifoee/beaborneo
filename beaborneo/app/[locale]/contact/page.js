@@ -158,7 +158,7 @@ export default async function ContactPage({ params }) {
                     ? 'Fill out the form below and we\'ll get back to you within 24 hours.' 
                     : 'Isi borang di bawah dan kami akan menghubungi anda dalam masa 24 jam.'}
                 </p>
-                <ContactForm locale={locale} />
+                <ContactForm locale={locale} contactEmail={email} />
               </div>
             </div>
 

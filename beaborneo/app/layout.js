@@ -11,7 +11,9 @@ export const metadata = {
   title: 'Bea Borneo Travel',
   description: 'Discover the beauty of Borneo with our curated travel experiences.',
   icons: {
-    icon: '/favicon.ico',
+    icon: '/beaborneofavicon.png',
+    shortcut: '/beaborneofavicon.png',
+    apple: '/beaborneofavicon.png',
   },
 };
 

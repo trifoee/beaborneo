@@ -131,22 +131,29 @@ function buildEmailText({ name, email, phone, subject, message }) {
 /* ------------------------------------------------------------------ */
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MAX_LEN = {
-  name: 100,
-  email: 254,
-  phone: 50,
-  subject: 50,
-  message: 2000,
-};
+const PHONE_REGEX = /^[+\d\s\-().]{7,20}$/;
+const VALID_SUBJECTS = new Set(['', 'general', 'booking', 'custom', 'feedback']);
+const MAX_LEN = { name: 100, email: 254, phone: 30, message: 2000 };
 
-/* Best-effort rate limiting (serverless-safe-ish):
-   - Works per warm instance (prevents bursts and basic abuse)
-   - For stronger protection across all instances, we can swap this
-     for Upstash/Redis later. */
-const RATE_LIMITS = {
-  perMinute: 5,
-  perHour: 20,
-};
+/* Spam keyword patterns — case-insensitive partial matches */
+const SPAM_KEYWORDS = [
+  /\bcasino\b/i,
+  /\bviagra\b/i,
+  /\bcialis\b/i,
+  /\bcryptocurren/i,
+  /\bnft\b/i,
+  /\bseo\s+service/i,
+  /\bbacklink/i,
+  /\bgucci\s+replica/i,
+  /\bloan\s+offer/i,
+  /\bunclaimed\s+(prize|reward)/i,
+  /\bclick\s+here\s+to\s+claim/i,
+];
+
+/* Best-effort in-process rate limiting (serverless-safe-ish).
+   Prevents bursts on warm instances. Swap for Upstash/Redis for
+   cross-instance protection. */
+const RATE_LIMITS = { perMinute: 3, perHour: 15 };
 const buckets = globalThis.__beaborneoContactBuckets || new Map();
 globalThis.__beaborneoContactBuckets = buckets;
 
@@ -158,14 +165,11 @@ function getClientIp(request) {
 
 function hitRateLimit(key, now) {
   const entry = buckets.get(key) || { hits: [] };
-  // keep last 60 minutes
   entry.hits = entry.hits.filter((t) => now - t < 60 * 60 * 1000);
   entry.hits.push(now);
-
   const hitsLastMinute = entry.hits.filter((t) => now - t < 60 * 1000).length;
   const hitsLastHour = entry.hits.length;
   buckets.set(key, entry);
-
   if (hitsLastMinute > RATE_LIMITS.perMinute) return { limited: true, window: 'minute' };
   if (hitsLastHour > RATE_LIMITS.perHour) return { limited: true, window: 'hour' };
   return { limited: false };
@@ -177,8 +181,30 @@ function countUrls(text) {
   return matches ? matches.length : 0;
 }
 
+function isSpam(text) {
+  if (!text) return false;
+  return SPAM_KEYWORDS.some((re) => re.test(text));
+}
+
 export async function POST(request) {
-  /* 1. Read & validate input */
+  /* 1. Require the custom header set by our ContactForm fetch call.
+     This blocks direct API calls from scripts that don't mimic a browser. */
+  if (request.headers.get('x-requested-with') !== 'XMLHttpRequest') {
+    return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  }
+
+  /* 2. Origin / Referer check — only accept requests from the same site. */
+  const allowedOrigin = process.env.NEXT_PUBLIC_SITE_URL || null;
+  const origin = request.headers.get('origin');
+  const referer = request.headers.get('referer');
+  if (allowedOrigin && origin && !origin.startsWith(allowedOrigin)) {
+    return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  }
+  if (allowedOrigin && !origin && referer && !referer.startsWith(allowedOrigin)) {
+    return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
+  }
+
+  /* 3. Read & validate input */
   let body;
   try {
     body = await request.json();
@@ -210,10 +236,10 @@ export async function POST(request) {
     );
   }
 
-  // Best-effort rate limiting
+  // Rate limit by IP
   const ip = getClientIp(request);
-  const rl = hitRateLimit(`ip:${ip}`, now);
-  if (rl.limited) {
+  const rlIp = hitRateLimit(`ip:${ip}`, now);
+  if (rlIp.limited) {
     return NextResponse.json(
       { error: 'Too many requests. Please try again later.' },
       { status: 429 },
@@ -227,9 +253,34 @@ export async function POST(request) {
     );
   }
 
-  if (!EMAIL_REGEX.test(email)) {
+  if (!EMAIL_REGEX.test(String(email))) {
     return NextResponse.json(
       { error: 'Invalid email format.' },
+      { status: 400 },
+    );
+  }
+
+  // Rate limit by email address (catches same sender across IPs)
+  const rlEmail = hitRateLimit(`email:${String(email).toLowerCase()}`, now);
+  if (rlEmail.limited) {
+    return NextResponse.json(
+      { error: 'Too many requests from this email. Please try again later.' },
+      { status: 429 },
+    );
+  }
+
+  // Phone format (optional field — only validate when provided)
+  if (phone && !PHONE_REGEX.test(String(phone))) {
+    return NextResponse.json(
+      { error: 'Invalid phone number format.' },
+      { status: 400 },
+    );
+  }
+
+  // Subject must be one of the known values
+  if (!VALID_SUBJECTS.has(String(subject || ''))) {
+    return NextResponse.json(
+      { error: 'Invalid subject.' },
       { status: 400 },
     );
   }
@@ -239,7 +290,6 @@ export async function POST(request) {
     String(name).length > MAX_LEN.name ||
     String(email).length > MAX_LEN.email ||
     String(phone || '').length > MAX_LEN.phone ||
-    String(subject || '').length > MAX_LEN.subject ||
     String(message).length > MAX_LEN.message
   ) {
     return NextResponse.json(
@@ -248,12 +298,20 @@ export async function POST(request) {
     );
   }
 
-  // Spam heuristic: too many links
+  // Too many URLs → likely spam
   const urlCount = countUrls(message);
   if (urlCount >= 3) {
     return NextResponse.json(
       { error: 'Please remove links from the message and try again.' },
       { status: 400 },
+    );
+  }
+
+  // Keyword spam filter
+  if (isSpam(message) || isSpam(name)) {
+    return NextResponse.json(
+      { success: true, message: 'Thank you for your message. We will get back to you soon!' },
+      { status: 200 },
     );
   }
 

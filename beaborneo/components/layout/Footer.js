@@ -1,49 +1,62 @@
-/**
- * Footer Component
- * 
- * Modern footer with Bea Borneo branding.
- */
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { t } from '@/lib/i18n';
+import { getContactInfo } from '@/lib/sanity.queries';
 
-const footerContent = {
-  description: {
-    en: 'Your trusted partner for authentic Borneo adventures. Discover wildlife, culture, and natural wonders with expert local guides.',
-    bm: 'Rakan kongsi dipercayai anda untuk pengembaraan Borneo yang autentik. Temui hidupan liar, budaya, dan keajaiban alam dengan pemandu tempatan pakar.',
-  },
-  socialLinks: [
-    { name: 'Facebook', href: 'https://facebook.com/beaborneotravel', icon: 'facebook' },
-    { name: 'Instagram', href: 'https://instagram.com/beaborneotravel', icon: 'instagram' },
-    { name: 'TikTok', href: 'https://tiktok.com/@beaborneotravel', icon: 'tiktok' },
-    { name: 'WhatsApp', href: 'https://wa.me/60182103921', icon: 'whatsapp' },
-  ],
-  contact: {
-    email: 'beaborneo@gmail.com',
-    phone: '+60 88 212 982',
-    mobile: '+60 18 210 3921',
-    address: {
-      en: 'Lot B13-2A-2, Block B, 1st Floor,\nKepayan Perdana, 88300\nPenampang, Sabah, Malaysia',
-      bm: 'Lot B13-2A-2, Blok B, Tingkat 1,\nKepayan Perdana, 88300\nPenampang, Sabah, Malaysia',
-    },
+const fallbackDescription = {
+  en: 'Your trusted partner for authentic Borneo adventures. Discover wildlife, culture, and natural wonders with expert local guides.',
+  bm: 'Rakan kongsi dipercayai anda untuk pengembaraan Borneo yang autentik. Temui hidupan liar, budaya, dan keajaiban alam dengan pemandu tempatan pakar.',
+};
+
+const fallbackSocialLinks = [
+  { name: 'Facebook', href: 'https://facebook.com/beaborneotravel', icon: 'facebook' },
+  { name: 'Instagram', href: 'https://instagram.com/beaborneotravel', icon: 'instagram' },
+  { name: 'TikTok', href: 'https://tiktok.com/@beaborneotravel', icon: 'tiktok' },
+  { name: 'WhatsApp', href: 'https://wa.me/60182103921', icon: 'whatsapp' },
+];
+
+const fallbackContact = {
+  email: 'beaborneo@gmail.com',
+  phone: '+60 88 212 982',
+  mobile: '+60 18 210 3921',
+  address: {
+    en: 'Lot B13-2A-2, Block B, 1st Floor,\nKepayan Perdana, 88300\nPenampang, Sabah, Malaysia',
+    bm: 'Lot B13-2A-2, Blok B, Tingkat 1,\nKepayan Perdana, 88300\nPenampang, Sabah, Malaysia',
   },
 };
 
-export default function Footer({ locale }) {
+export default async function Footer({ locale }) {
   const currentYear = new Date().getFullYear();
-  
+
+  let contactInfo;
+  try {
+    contactInfo = await getContactInfo();
+  } catch {
+    // fall through to hardcoded fallbacks
+  }
+
+  const email = contactInfo?.email || fallbackContact.email;
+  const phone = contactInfo?.phone || fallbackContact.phone;
+  const address =
+    contactInfo?.address ||
+    fallbackContact.address[locale] ||
+    fallbackContact.address.en;
+
+  // Build social links: prefer CMS data, map icon name from platform, else use fallback
+  const socialLinks =
+    Array.isArray(contactInfo?.socialLinks) && contactInfo.socialLinks.length > 0
+      ? contactInfo.socialLinks.map((s) => ({
+          name: s.platform,
+          href: s.url,
+          icon: s.platform?.toLowerCase() || 'facebook',
+        }))
+      : fallbackSocialLinks;
+
   const quickLinks = [
     { label: t(locale, 'navigation.home'), href: `/${locale}` },
     { label: t(locale, 'navigation.tours'), href: `/${locale}/tours` },
     { label: t(locale, 'navigation.about'), href: `/${locale}/about` },
     { label: t(locale, 'navigation.contact'), href: `/${locale}/contact` },
-  ];
-
-  const tourLinks = [
-    { label: 'Kinabatangan Safari', href: `/${locale}/tours/kinabatangan-river-safari` },
-    { label: 'Mount Kinabalu', href: `/${locale}/tours/mount-kinabalu-expedition` },
-    { label: 'Orangutan Discovery', href: `/${locale}/tours/orangutan-discovery` },
   ];
 
   return (
@@ -53,7 +66,6 @@ export default function Footer({ locale }) {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
           {/* Brand Column */}
           <div className="lg:col-span-1">
-            {/* Logo */}
             <Link href={`/${locale}`} className="inline-flex items-center gap-3 mb-6 group">
               <div className="w-12 h-12 rounded-full overflow-hidden shadow-md transition-transform duration-300 group-hover:scale-105">
                 <Image
@@ -71,14 +83,14 @@ export default function Footer({ locale }) {
                 </div>
               </div>
             </Link>
-            
+
             <p className="text-gray-400 leading-relaxed mb-6">
-              {footerContent.description[locale] || footerContent.description.en}
+              {fallbackDescription[locale] || fallbackDescription.en}
             </p>
-            
+
             {/* Social Links */}
             <div className="flex gap-3">
-              {footerContent.socialLinks.map((social) => (
+              {socialLinks.map((social) => (
                 <a
                   key={social.name}
                   href={social.href}
@@ -113,24 +125,31 @@ export default function Footer({ locale }) {
             </ul>
           </div>
 
-          {/* Popular Tours */}
+          {/* Official Partners */}
           <div>
-            <h3 className="font-bold text-lg mb-6">
-              {locale === 'en' ? 'Popular Tours' : 'Pakej Popular'}
+            <h3 className="font-bold text-lg mb-2">
+              {locale === 'en' ? 'Official Partners' : 'Rakan Rasmi'}
             </h3>
-            <ul className="space-y-3">
-              {tourLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-gray-400 hover:text-white transition-colors inline-flex items-center gap-2 group"
-                  >
-                    <span className="w-0 h-0.5 bg-[#E31E24] group-hover:w-3 transition-all" />
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <div className="flex flex-col items-start gap-2">
+              <div className="relative w-54 h-25">
+                <Image
+                  src="/visitmalaysia26.png"
+                  alt="Visit Malaysia 2026"
+                  fill
+                  className="object-contain object-left-center"
+                  sizes="176px"
+                />
+              </div>
+              <div className="relative w-54 h-25">
+                <Image
+                  src="/stblogo.png"
+                  alt="Sabah Tourism Board"
+                  fill
+                  className="object-contain object-left-center"
+                  sizes="176px"
+                />
+              </div>
+            </div>
           </div>
 
           {/* Contact Info */}
@@ -147,11 +166,11 @@ export default function Footer({ locale }) {
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">Email</div>
-                  <a 
-                    href={`mailto:${footerContent.contact.email}`}
+                  <a
+                    href={`mailto:${email}`}
                     className="text-gray-300 hover:text-white transition-colors"
                   >
-                    {footerContent.contact.email}
+                    {email}
                   </a>
                 </div>
               </li>
@@ -163,17 +182,11 @@ export default function Footer({ locale }) {
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">{locale === 'en' ? 'Phone' : 'Telefon'}</div>
-                  <a 
-                    href={`tel:${footerContent.contact.phone}`}
+                  <a
+                    href={`tel:${phone}`}
                     className="text-gray-300 hover:text-white transition-colors block"
                   >
-                    {footerContent.contact.phone}
-                  </a>
-                  <a 
-                    href={`tel:${footerContent.contact.mobile}`}
-                    className="text-gray-300 hover:text-white transition-colors block"
-                  >
-                    {footerContent.contact.mobile}
+                    {phone}
                   </a>
                 </div>
               </li>
@@ -186,7 +199,7 @@ export default function Footer({ locale }) {
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">{locale === 'en' ? 'Location' : 'Lokasi'}</div>
-                  <span className="text-gray-300 whitespace-pre-line">{footerContent.contact.address[locale] || footerContent.contact.address.en}</span>
+                  <span className="text-gray-300 whitespace-pre-line">{address}</span>
                 </div>
               </li>
             </ul>
