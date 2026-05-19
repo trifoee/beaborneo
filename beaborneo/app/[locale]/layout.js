@@ -1,10 +1,3 @@
-/**
- * Locale Layout
- * 
- * Layout for all pages within a specific locale.
- * Features modern typography and Bea Borneo branding.
- */
-
 import { Playfair_Display, Inter } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { locales, localeHtmlLang } from '@/lib/i18n';
@@ -12,14 +5,12 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import '../globals.css';
 
-// Elegant serif for headings
 const playfair = Playfair_Display({
   subsets: ['latin'],
   variable: '--font-heading',
   display: 'swap',
 });
 
-// Modern sans-serif for body text
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-body',
@@ -38,15 +29,6 @@ export async function generateMetadata({ params }) {
       template: '%s | Bea Borneo Travel',
       default: 'Bea Borneo Travel - Dream • Explore • Discover',
     },
-    other: {
-      'script:ld+json': JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'TravelAgency',
-        name: 'Bea Borneo Travel & Tours Sdn. Bhd.',
-        url: 'https://beaborneo.com',
-        logo: 'https://beaborneo.com/images/logo.png',
-      }),
-    },
   };
 }
 
@@ -57,8 +39,22 @@ export default async function LocaleLayout({ children, params }) {
     notFound();
   }
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TravelAgency',
+    name: 'Bea Borneo Travel & Tours Sdn. Bhd.',
+    url: 'https://beaborneo.com',
+    logo: 'https://beaborneo.com/images/logo.png',
+  };
+
   return (
     <html lang={localeHtmlLang[locale]} className="scroll-smooth">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className={`${playfair.variable} ${inter.variable} font-body antialiased bg-white text-gray-900`}>
         <div className="flex min-h-screen flex-col">
           <Header locale={locale} />
