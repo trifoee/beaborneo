@@ -38,6 +38,15 @@ export async function generateMetadata({ params }) {
       template: '%s | Bea Borneo Travel',
       default: 'Bea Borneo Travel - Dream • Explore • Discover',
     },
+    other: {
+      'script:ld+json': JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'TravelAgency',
+        name: 'Bea Borneo Travel & Tours Sdn. Bhd.',
+        url: 'https://beaborneo.com',
+        logo: 'https://beaborneo.com/images/logo.png',
+      }),
+    },
   };
 }
 
