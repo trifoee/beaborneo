@@ -21,16 +21,21 @@ const nextConfig = {
 
   // Redirects
   async redirects() {
-    return [
-      // Add any custom redirects here
-      // Example: Redirect old URLs to new ones
-      // {
-      //   source: '/old-page',
-      //   destination: '/en/new-page',
-      //   permanent: true,
-      // },
-    ];
-  },
+  return [
+    // Force all non-www to www
+    {
+      source: '/:path*',
+      has: [
+        {
+          type: 'host',
+          value: 'beaborneo.com',
+        },
+      ],
+      destination: 'https://www.beaborneo.com/:path*',
+      permanent: true,
+    },
+  ];
+},
 
   // Headers for security and caching
   async headers() {
