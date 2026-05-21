@@ -1,4 +1,4 @@
-import { generateMetadata as generateSeoMetadata } from '@/lib/seo';
+import { generateMetadata as generateSeoMetadata, generateOrganizationSchema } from '@/lib/seo';
 import Hero from '@/components/sections/Hero';
 import FeaturedTours from '@/components/sections/FeaturedTours';
 import Destinations from '@/components/sections/Destinations';
@@ -9,19 +9,16 @@ import { getAllTours, getAllTestimonials } from '@/lib/sanity.queries';
 const homeContent = {
   testimonialsTitle: {
     en: 'What Our Travelers Say',
-    ms: 'Apa Kata Pengembara Kami',
-    id: 'Apa Kata Wisatawan Kami',
+    bm: 'Apa Kata Pengembara Kami',
   },
   seo: {
     title: {
       en: 'Bea Borneo Travel - Dream • Explore • Discover',
-      ms: 'Bea Borneo Travel - Impian • Terokai • Temui',
-      id: 'Bea Borneo Travel - Impian • Jelajahi • Temukan',
+      bm: 'Bea Borneo Travel - Impian • Terokai • Temui',
     },
     description: {
       en: 'Explore Borneo with Bea Borneo Travel. Experience wildlife safaris, mountain expeditions, and cultural tours in Sabah and Sarawak.',
-      ms: 'Terokai Borneo dengan Bea Borneo Travel. Alami safari hidupan liar, ekspedisi gunung, dan lawatan budaya di Sabah dan Sarawak.',
-      id: 'Jelajahi Borneo dengan Bea Borneo Travel. Rasakan safari satwa liar, ekspedisi gunung, dan tur budaya di Sabah dan Sarawak.',
+      bm: 'Terokai Borneo dengan Bea Borneo Travel. Alami safari hidupan liar, ekspedisi gunung, dan lawatan budaya di Sabah dan Sarawak.',
     },
   },
 };
@@ -40,6 +37,9 @@ export async function generateMetadata({ params }) {
 export default async function HomePage({ params }) {
   const { locale } = await params;
 
+  // Generate organization schema for this locale
+  const organizationSchema = generateOrganizationSchema(locale);
+
   let allTours = [];
   let featuredTours = [];
   try {
@@ -49,11 +49,6 @@ export default async function HomePage({ params }) {
     console.error('Failed to fetch tours for homepage:', err);
   }
 
-  /* Fetch the entire testimonial pool. The Testimonials component is
-     a client component that shuffles and picks 3 on the visitor's
-     browser, so each visit gets a fresh random selection while the
-     page itself stays statically rendered. The webhook keeps this
-     pool fresh whenever editors add/edit reviews in Sanity. */
   let testimonials = [];
   try {
     testimonials = (await getAllTestimonials()) || [];
@@ -65,6 +60,12 @@ export default async function HomePage({ params }) {
 
   return (
     <>
+      {/* Organization Schema for Google */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+
       <Hero locale={locale} featuredTours={featuredTours} />
 
       <FeaturedTours locale={locale} tours={toursForGrid} />
