@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { locales, localeHtmlLang } from '@/lib/i18n';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import MetaTags from '@/components/seo/MetaTags'
 import '../globals.css';
 
 const playfair = Playfair_Display({
@@ -39,21 +40,10 @@ export default async function LocaleLayout({ children, params }) {
     notFound();
   }
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'TravelAgency',
-    name: 'Bea Borneo Travel & Tours Sdn. Bhd.',
-    url: 'https://beaborneo.com',
-    logo: 'https://beaborneo.com/images/logo.png',
-  };
-
   return (
     <html lang={localeHtmlLang[locale]} className="scroll-smooth">
       <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        <MetaTags type="organization" locale={locale} />
       </head>
       <body className={`${playfair.variable} ${inter.variable} font-body antialiased bg-white text-gray-900`}>
         <div className="flex min-h-screen flex-col">
