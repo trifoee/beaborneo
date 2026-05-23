@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation';
 import { locales, localeHtmlLang } from '@/lib/i18n';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import MetaTags from '@/components/seo/MetaTags'
 import '../globals.css';
 
 const playfair = Playfair_Display({
@@ -42,9 +41,6 @@ export default async function LocaleLayout({ children, params }) {
 
   return (
     <html lang={localeHtmlLang[locale]} className="scroll-smooth">
-      <head>
-        <MetaTags type="organization" locale={locale} />
-      </head>
       <body className={`${playfair.variable} ${inter.variable} font-body antialiased bg-white text-gray-900`}>
         <div className="flex min-h-screen flex-col">
           <Header locale={locale} />
