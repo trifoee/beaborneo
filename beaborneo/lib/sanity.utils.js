@@ -47,3 +47,63 @@ export function getLocalizedField(obj, locale) {
   if (typeof obj === 'string') return obj;
   return obj[locale] || obj.en || '';
 }
+
+/**
+ * Rank candidate tours by content-based similarity to the current tour,
+ * for the "You May Also Like" section.
+ *
+ * Signals (highest weight first), using the data we already store:
+ *   - shared tour categories (`tourType`) — the strongest "same kind of
+ *     trip" signal, e.g. both scuba-diving
+ *   - same location/region — geographically relevant alternatives
+ *   - same pricing model (`pricingType`) — similar trip style / budget shape
+ *   - featured — a gentle nudge toward our flagship tours
+ *
+ * Tours with no overlap still rank (by featured, then newest), so the
+ * section always fills even for a one-off tour with no obvious siblings.
+ *
+ * @param {object} current   The tour being viewed (full detail shape).
+ * @param {object[]} candidates  Other tours (card-shaped).
+ * @param {number} limit     Max number to return.
+ * @returns {object[]}       Top `limit` candidates, most relevant first.
+ */
+export function getRelatedTours(current, candidates, limit = 3) {
+  if (!current || !Array.isArray(candidates)) return [];
+
+  const currentTypes = new Set(current.tourType || []);
+  const currentLocation = (current.location || '').trim().toLowerCase();
+
+  const scored = candidates
+    .filter((tour) => tour && tour._id !== current._id)
+    .map((tour) => {
+      let score = 0;
+
+      const sharedTypes = (tour.tourType || []).filter((t) =>
+        currentTypes.has(t),
+      ).length;
+      score += sharedTypes * 10;
+
+      if (
+        currentLocation &&
+        (tour.location || '').trim().toLowerCase() === currentLocation
+      ) {
+        score += 5;
+      }
+
+      if (current.pricingType && tour.pricingType === current.pricingType) {
+        score += 1;
+      }
+
+      if (tour.featured) score += 1;
+
+      return { tour, score };
+    });
+
+  scored.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    if (!!b.tour.featured !== !!a.tour.featured) return b.tour.featured ? 1 : -1;
+    return (b.tour._createdAt || '').localeCompare(a.tour._createdAt || '');
+  });
+
+  return scored.slice(0, limit).map((entry) => entry.tour);
+}

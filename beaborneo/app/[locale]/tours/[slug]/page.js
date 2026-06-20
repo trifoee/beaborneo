@@ -2,10 +2,19 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { generateMetadata as generateSeoMetadata } from '@/lib/seo';
 import { t } from '@/lib/i18n';
-import { getTourBySlug, getAllTourSlugs } from '@/lib/sanity.queries';
-import { portableTextToPlainText, getLocalizedField } from '@/lib/sanity.utils';
+import {
+  getTourBySlug,
+  getAllTourSlugs,
+  getRelatedTourCandidates,
+} from '@/lib/sanity.queries';
+import {
+  portableTextToPlainText,
+  getLocalizedField,
+  getRelatedTours,
+} from '@/lib/sanity.utils';
 import ImageBlock from '@/components/ui/ImageBlock';
 import Button from '@/components/ui/Button';
+import TourCard from '@/components/ui/TourCard';
 import TourPricingTable from './TourPricingTable';
 
 // --------------- static params ---------------
@@ -63,6 +72,14 @@ export default async function TourPage({ params }) {
   const overviewText = tour.overview
     ? portableTextToPlainText(tour.overview[locale] || tour.overview.en)
     : '';
+
+  let relatedTours = [];
+  try {
+    const candidates = await getRelatedTourCandidates(slug);
+    relatedTours = getRelatedTours(tour, candidates, 3);
+  } catch (err) {
+    console.error('Failed to fetch related tours:', err);
+  }
 
   return (
     <div className="tour-page">
@@ -314,6 +331,38 @@ export default async function TourPage({ params }) {
           </div>
         </div>
       </section>
+
+      {/* You May Also Like */}
+      {relatedTours.length > 0 && (
+        <section className="pb-16 md:pb-24 bg-earth-50">
+          <div className="container mx-auto px-4 lg:px-8 py-16 md:py-20">
+            <div className="flex flex-wrap items-end justify-between gap-4 mb-10">
+              <div>
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#E31E24] mb-2">
+                  <span className="w-1.5 h-1.5 bg-[#E31E24] rounded-full" />
+                  {locale === 'en' ? 'Keep Exploring' : 'Teruskan Penerokaan'}
+                </span>
+                <h2 className="font-heading text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">
+                  {locale === 'en' ? 'You May Also Like' : 'Anda Mungkin Juga Suka'}
+                </h2>
+              </div>
+              <Link
+                href={`/${locale}/tours`}
+                className="hidden md:inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium"
+              >
+                {locale === 'en' ? 'View all tours' : 'Lihat semua pakej'}
+                <span aria-hidden="true">&rarr;</span>
+              </Link>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {relatedTours.map((relatedTour) => (
+                <TourCard key={relatedTour._id} tour={relatedTour} locale={locale} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Back link */}
       <section className="pb-16">
