@@ -4,6 +4,7 @@ import FeaturedTours from '@/components/sections/FeaturedTours';
 import Destinations from '@/components/sections/Destinations';
 import Testimonials from '@/components/sections/Testimonials';
 import CallToAction from '@/components/sections/CallToAction';
+import YoutubeSection from '@/components/sections/YoutubeSection';
 import { getAllTours, getAllTestimonials } from '@/lib/sanity.queries';
 
 const homeContent = {
@@ -67,6 +68,8 @@ export default async function HomePage({ params }) {
       />
 
       <Hero locale={locale} featuredTours={featuredTours} />
+
+      <YoutubeSection locale={locale} />
 
       <FeaturedTours locale={locale} tours={toursForGrid} />
 
