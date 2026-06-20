@@ -9,8 +9,9 @@
 
 import { generateMetadata as generateSeoMetadata } from '@/lib/seo';
 import { getLocalizedValue } from '@/lib/i18n';
-import { getTransportServices } from '@/lib/sanity.queries';
+import { getTransportServices, getCarRentalGallery } from '@/lib/sanity.queries';
 import Button from '@/components/ui/Button';
+import CarRentalGallery from '@/components/sections/CarRentalGallery';
 
 /* ------------------------------------------------------------------ */
 /*  Static content / labels                                            */
@@ -230,6 +231,13 @@ export default async function CarRentalPage({ params }) {
     transport = (await getTransportServices()) || transport;
   } catch (err) {
     console.error('Failed to fetch transport services:', err);
+  }
+
+  let carGalleryImages = [];
+  try {
+    carGalleryImages = (await getCarRentalGallery()) || [];
+  } catch (err) {
+    console.error('Failed to fetch car rental gallery:', err);
   }
 
   /* Sort self-drive groups by our preferred display order */
@@ -543,6 +551,9 @@ export default async function CarRentalPage({ params }) {
           </div>
         </section>
       )}
+
+      {/* ── Car Rental Gallery (CMS) ─────────────────────────────── */}
+      <CarRentalGallery locale={locale} images={carGalleryImages} />
 
       {/* ── Why Rent With Us ─────────────────────────────────────── */}
       <section className="py-20 md:py-32">
