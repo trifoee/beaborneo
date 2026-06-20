@@ -13,6 +13,7 @@ export const SANITY_TAGS = {
   transportService: 'transportService',
   contactInfo: 'contactInfo',
   galleryImage: 'galleryImage',
+  carRentalGallery: 'carRentalGallery',
   ourStory: 'ourStory',
   ourValue: 'ourValue',
   socialLinks: 'socialLinks',
@@ -86,6 +87,32 @@ export const tourBySlugQuery = `
  */
 export const allTourSlugsQuery = `
   *[_type == "tour"]{ "slug": slug.current }
+`;
+
+/**
+ * Candidate tours for the "You May Also Like" section on a tour detail
+ * page. Excludes the current tour and returns the same card-shaped data
+ * the listing uses (single-object pricing for "starting from"), plus the
+ * fields needed to score similarity (tourType, location, pricingType).
+ */
+export const relatedTourCandidatesQuery = `
+  *[_type == "tour" && slug.current != $slug] {
+    _id,
+    _createdAt,
+    title,
+    slug,
+    "mainImageUrl": mainImage.asset->url,
+    tagline,
+    duration,
+    tourType,
+    location,
+    featured,
+    pricingType,
+    packagePricing[0]{ adult, child },
+    groupPricing[0]{ adult, child },
+    marketPricing[0]{ malaysian, international },
+    accommodationPricingSimple[0]{ price }
+  }
 `;
 
 /* ------------------------------------------------------------------ */
@@ -181,6 +208,14 @@ export async function getAllTourSlugs() {
   return sanityClient.fetch(allTourSlugsQuery, {}, tagged([SANITY_TAGS.tour]));
 }
 
+export async function getRelatedTourCandidates(slug) {
+  return sanityClient.fetch(
+    relatedTourCandidatesQuery,
+    { slug },
+    tagged([SANITY_TAGS.tour]),
+  );
+}
+
 export async function getTransportServices() {
   return sanityClient.fetch(
     transportServicesByTypeQuery,
@@ -194,6 +229,19 @@ export async function getContactInfo() {
     contactInfoQuery,
     {},
     tagged([SANITY_TAGS.contactInfo]),
+  );
+}
+
+export async function getCarRentalGallery() {
+  return sanityClient.fetch(
+    `*[_type == "carRentalGallery"] | order(coalesce(order, 9999) asc, _createdAt asc) {
+      _id,
+      title,
+      "imageUrl": image.asset->url,
+      "imageAlt": coalesce(title, "Car Rental")
+    }`,
+    {},
+    tagged([SANITY_TAGS.carRentalGallery]),
   );
 }
 
