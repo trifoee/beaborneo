@@ -13,6 +13,7 @@ export const SANITY_TAGS = {
   transportService: 'transportService',
   contactInfo: 'contactInfo',
   galleryImage: 'galleryImage',
+  carRentalGallery: 'carRentalGallery',
   ourStory: 'ourStory',
   ourValue: 'ourValue',
   socialLinks: 'socialLinks',
@@ -228,6 +229,19 @@ export async function getContactInfo() {
     contactInfoQuery,
     {},
     tagged([SANITY_TAGS.contactInfo]),
+  );
+}
+
+export async function getCarRentalGallery() {
+  return sanityClient.fetch(
+    `*[_type == "carRentalGallery"] | order(coalesce(order, 9999) asc, _createdAt asc) {
+      _id,
+      title,
+      "imageUrl": image.asset->url,
+      "imageAlt": coalesce(title, "Car Rental")
+    }`,
+    {},
+    tagged([SANITY_TAGS.carRentalGallery]),
   );
 }
 
