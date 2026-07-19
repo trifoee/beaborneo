@@ -179,7 +179,7 @@ function AccommodationPricing({ rows, locale }) {
               {locale === 'en' ? 'Type' : 'Jenis'}
             </th>
             <th className="pb-2 text-right font-medium">
-              {locale === 'en' ? 'Per Person' : 'Seorang'}
+              {locale === 'en' ? 'Start from' : 'Mula dari'}
             </th>
           </tr>
         </thead>
