@@ -211,9 +211,8 @@ Saat ini, jangkauan pasar kami melampaui Malaysia, dengan kehadiran kuat di Indo
   },
   stats: [
     { value: 'MOTAC', label: { en: 'Licensed Agency', ms: 'Agensi Berlesen', id: 'Agen Berlisensi' } },
-    { value: '5+', label: { en: 'Regions Covered', ms: 'Wilayah Diliputi', id: 'Wilayah Tercakup' } },
-    { value: '50+', label: { en: 'Tour Packages', ms: 'Pakej Pelancongan', id: 'Paket Wisata' } },
-    { value: '5+', label: { en: 'Countries Served', ms: 'Negara Dilayan', id: 'Negara Dilayani' } },
+    { value: 'Local & International', label: { en: 'Tours Covered', ms: 'Wilayah Diliputi', id: 'Wilayah Tercakup' } },
+    { value: '2+', label: { en: 'Countries Served', ms: 'Negara Dilayan', id: 'Negara Dilayani' } },
   ],
   seo: {
     title: { en: 'About Us', ms: 'Tentang Kami', id: 'Tentang Kami' },
@@ -312,7 +311,7 @@ export default async function AboutPage({ params }) {
         </div>
       </section>
 
-      {/* Stats Bar */}
+      {/* Stats Bar
       <section className="relative -mt-16 z-20">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="bg-white rounded-3xl shadow-2xl shadow-gray-200/50 p-8 md:p-12">
@@ -330,7 +329,7 @@ export default async function AboutPage({ params }) {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Our Story Section */}
       <section className="py-20 md:py-32">
