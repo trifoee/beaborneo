@@ -6,7 +6,7 @@ const YOUTUBE_WATCH = `https://youtu.be/${YOUTUBE_ID}?si=0FWax_Fr0KXk4sQL`;
 
 export default function YoutubeSection({ locale }) {
   return (
-    <section className="py-20 md:py-28 bg-earth-50">
+    <section className="py-12 md:py-16 bg-earth-50">
       <div className="container mx-auto px-4 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-10">

@@ -129,7 +129,7 @@ export default function Hero({ locale, featuredTours }) {
     : null;
 
   return (
-    <section className="hero relative min-h-screen overflow-hidden">
+    <section className="hero relative min-h-[450px] md:min-h-[500px] lg:min-h-[550px] overflow-hidden">
       {/* Background Images */}
       {slides.map((s, index) => (
         <div
@@ -154,8 +154,8 @@ export default function Hero({ locale, featuredTours }) {
       ))}
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 lg:px-8 min-h-screen flex items-center">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center w-full pt-24 pb-16">
+      <div className="relative z-10 container mx-auto px-4 lg:px-8 h-full flex items-center">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center w-full py-12 md:py-14">
           <div className="max-w-2xl">
             {/* Subtitle / tagline badge */}
             {slideSubtitle && (
@@ -173,7 +173,7 @@ export default function Hero({ locale, featuredTours }) {
             {/* Title */}
             <h1
               key={`title-${currentSlide}`}
-              className="animate-fade-in-up opacity-0 delay-100 font-heading text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-6 leading-[1.1]"
+              className="animate-fade-in-up opacity-0 delay-100 font-heading text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 leading-[1.1]"
             >
               {slideTitle}
             </h1>
@@ -182,7 +182,7 @@ export default function Hero({ locale, featuredTours }) {
             {slideDescription && (
               <p
                 key={`desc-${currentSlide}`}
-                className="animate-fade-in-up opacity-0 delay-200 text-lg md:text-xl text-white/80 mb-8 leading-relaxed max-w-xl"
+                className="animate-fade-in-up opacity-0 delay-200 text-base md:text-lg text-white/80 mb-6 leading-relaxed max-w-xl"
               >
                 {slideDescription}
               </p>
@@ -191,7 +191,7 @@ export default function Hero({ locale, featuredTours }) {
             {/* Meta Info */}
             <div
               key={`meta-${currentSlide}`}
-              className="animate-fade-in-up opacity-0 delay-300 flex flex-wrap items-center gap-6 mb-8"
+              className="animate-fade-in-up opacity-0 delay-300 flex flex-wrap items-center gap-6 mb-6"
             >
               {slide.location && (
                 <div className="flex items-center gap-2 text-white/70">
@@ -273,7 +273,7 @@ export default function Hero({ locale, featuredTours }) {
       {/* Bottom Controls */}
       <div className="absolute bottom-8 left-0 right-0 z-20">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-center">
             <div className="flex items-center gap-3">
               <button
                 onClick={handlePrevSlide}
@@ -295,6 +295,30 @@ export default function Hero({ locale, featuredTours }) {
                   />
                 </svg>
               </button>
+              
+              {/* Slide indicators */}
+              <div className="flex items-center gap-2 px-4">
+                {slides.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      if (!isAnimating) {
+                        setIsAnimating(true);
+                        setCurrentSlide(index);
+                        setTimeout(() => setIsAnimating(false), 800);
+                      }
+                    }}
+                    className={cn(
+                      'h-1 rounded-full transition-all',
+                      index === currentSlide
+                        ? 'w-8 bg-[#E31E24]'
+                        : 'w-4 bg-white/30 hover:bg-white/50',
+                    )}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                ))}
+              </div>
+              
               <button
                 onClick={handleNextSlide}
                 disabled={isAnimating}
@@ -315,28 +339,6 @@ export default function Hero({ locale, featuredTours }) {
                   />
                 </svg>
               </button>
-            </div>
-
-            <div className="hidden md:flex items-center gap-2">
-              {slides.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    if (!isAnimating) {
-                      setIsAnimating(true);
-                      setCurrentSlide(index);
-                      setTimeout(() => setIsAnimating(false), 800);
-                    }
-                  }}
-                  className={cn(
-                    'h-1 rounded-full transition-all',
-                    index === currentSlide
-                      ? 'w-8 bg-[#E31E24]'
-                      : 'w-4 bg-white/30 hover:bg-white/50',
-                  )}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
             </div>
           </div>
         </div>

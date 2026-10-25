@@ -1,5 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable Turbopack (Next.js 16 default)
+  turbopack: {},
+  
+  // Suppress benign hydration warnings from Next.js metadata handling
+  reactStrictMode: true,
+  
   // Image optimization configuration
   images: {
     // Remote patterns for CMS images (Sanity)

@@ -27,7 +27,7 @@ const ctaContent = {
 
 export default function CallToAction({ locale }) {
   return (
-    <section className="cta relative py-24 md:py-32 overflow-hidden">
+    <section className="cta relative py-12 md:py-16 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 bg-[#E31E24]" />
       
@@ -60,7 +60,7 @@ export default function CallToAction({ locale }) {
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               href={`/${locale}/contact`}
               variant="white"
@@ -77,20 +77,6 @@ export default function CallToAction({ locale }) {
             >
               {locale === 'en' ? 'Browse Tours' : 'Lihat Pakej'}
             </Button>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 max-w-xl mx-auto">
-            {ctaContent.stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-white mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-white/70 text-sm">
-                  {getLocalizedValue(stat.label, locale)}
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </div>
