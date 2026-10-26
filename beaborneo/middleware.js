@@ -1,20 +1,21 @@
 /**
- * Middleware for Locale Handling
- * 
- * Handles locale detection and redirection.
- * - Redirects root path to default locale
- * - Validates locale in URL
+ * Combined Middleware
+ * 1. Locale detection and redirection
+ * 2. HTML formatting for "View Page Source"
  */
 
 import { NextResponse } from 'next/server';
 import { locales, defaultLocale } from '@/lib/i18n';
+import { formatHTML } from '@/lib/htmlFormatter';
 
-export function middleware(request) {
+export async function middleware(request) {
   const { pathname } = request.nextUrl;
 
+  // ============================================
+  // PART 1: Locale Handling
+  // ============================================
+  
   // Legacy locale redirects
-  // - /ms → /bm (rename)
-  // - /id → /en (disabled for now)
   if (pathname === '/ms' || pathname.startsWith('/ms/')) {
     const newUrl = request.nextUrl.clone();
     newUrl.pathname = pathname.replace(/^\/ms(?=\/|$)/, '/bm');
@@ -26,15 +27,7 @@ export function middleware(request) {
     return NextResponse.redirect(newUrl);
   }
 
-  // Check if the pathname starts with a locale
-  const pathnameHasLocale = locales.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
-  );
-
-  // Skip middleware for:
-  // - API routes
-  // - Static files
-  // - Next.js internals
+  // Skip middleware for API routes, static files, and Next.js internals
   if (
     pathname.startsWith('/api/') ||
     pathname.startsWith('/_next/') ||
@@ -44,59 +37,84 @@ export function middleware(request) {
     return NextResponse.next();
   }
 
-  // If pathname already has a locale, proceed
-  if (pathnameHasLocale) {
-    return NextResponse.next();
-  }
+  // Check if the pathname starts with a locale
+  const pathnameHasLocale = locales.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+  );
 
-  // Redirect to default locale
-  // Try to detect user's preferred locale from Accept-Language header
-  const acceptLanguage = request.headers.get('Accept-Language');
-  let detectedLocale = defaultLocale;
+  // Redirect to default locale if not present
+  if (!pathnameHasLocale) {
+    const acceptLanguage = request.headers.get('Accept-Language');
+    let detectedLocale = defaultLocale;
 
-  if (acceptLanguage) {
-    // Parse Accept-Language header
-    const preferredLocales = acceptLanguage
-      .split(',')
-      .map((lang) => {
-        const [locale, priority] = lang.trim().split(';q=');
-        return {
-          locale: locale.split('-')[0].toLowerCase(),
-          priority: priority ? parseFloat(priority) : 1,
-        };
-      })
-      .sort((a, b) => b.priority - a.priority);
+    if (acceptLanguage) {
+      const preferredLocales = acceptLanguage
+        .split(',')
+        .map((lang) => {
+          const [locale, priority] = lang.trim().split(';q=');
+          return {
+            locale: locale.split('-')[0].toLowerCase(),
+            priority: priority ? parseFloat(priority) : 1,
+          };
+        })
+        .sort((a, b) => b.priority - a.priority);
 
-    // Find first matching locale
-    for (const { locale } of preferredLocales) {
-      if (locales.includes(locale)) {
-        detectedLocale = locale;
-        break;
+      for (const { locale } of preferredLocales) {
+        if (locales.includes(locale)) {
+          detectedLocale = locale;
+          break;
+        }
       }
     }
+
+    const newUrl = new URL(`/${detectedLocale}${pathname}`, request.url);
+    newUrl.search = request.nextUrl.search;
+    return NextResponse.redirect(newUrl);
   }
 
-  // Build the new URL with the detected locale
-  const newUrl = new URL(`/${detectedLocale}${pathname}`, request.url);
+  // ============================================
+  // PART 2: HTML Formatting
+  // ============================================
   
-  // Preserve query string
-  newUrl.search = request.nextUrl.search;
+  // Get the response
+  const response = NextResponse.next();
+  
+  // Only format HTML responses (skip API, JSON, etc.)
+  const accept = request.headers.get('accept') || '';
+  if (!accept.includes('text/html')) {
+    return response;
+  }
 
-  return NextResponse.redirect(newUrl);
+  // Clone the response to modify it
+  const originalResponse = await fetch(request.url);
+  
+  // Check if it's HTML
+  const contentType = originalResponse.headers.get('content-type') || '';
+  if (!contentType.includes('text/html')) {
+    return response;
+  }
+
+  try {
+    // Get the HTML
+    const html = await originalResponse.text();
+    
+    // Format it
+    const formattedHTML = formatHTML(html);
+    
+    // Return formatted response
+    return new NextResponse(formattedHTML, {
+      status: originalResponse.status,
+      statusText: originalResponse.statusText,
+      headers: originalResponse.headers,
+    });
+  } catch (error) {
+    console.error('HTML formatting error:', error);
+    return response;
+  }
 }
 
 export const config = {
-  // Match all paths except API routes, static files, and Next.js internals
   matcher: [
-    /*
-     * Match all request paths except:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - images (public images)
-     * - files with extensions (e.g., .jpg, .css, .js)
-     */
     '/((?!api|_next/static|_next/image|favicon.ico|images|.*\\..*).*)',
   ],
 };
